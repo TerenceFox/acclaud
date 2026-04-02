@@ -30,13 +30,13 @@ All commands default to the previous month when no period is given.
 
 | Variable | Description | Default |
 |---|---|---|
-| `ACCLAUD_VAULT` | Output directory for monthly reports | `.` (current directory) |
-| `ACCLAUD_ATTACHMENTS` | Output directory for report images | same as vault |
+| `ACCLAUD_OUTPUT` | Output directory for reports and images | `output/` |
+| `ACCLAUD_ATTACHMENTS` | Optional separate directory for images | same as `ACCLAUD_OUTPUT` |
 
 Configure in `.env` (created on first run, excluded from git):
 
 ```sh
-ACCLAUD_VAULT=~/notes/02 Areas/Budget
+ACCLAUD_OUTPUT=~/notes/02 Areas/Budget
 ACCLAUD_ATTACHMENTS=~/notes/attachments
 ```
 
