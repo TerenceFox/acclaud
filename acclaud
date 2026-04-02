@@ -27,10 +27,13 @@ import sys
 import tempfile
 import webbrowser
 from datetime import date, timedelta
+from dotenv import load_dotenv
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 JOURNAL = os.path.join(SCRIPT_DIR, "budget.journal")
 TRANSACTIONS = os.path.join(SCRIPT_DIR, "transactions.journal")
+
+load_dotenv(os.path.join(SCRIPT_DIR, ".env"))
 ACCOUNTS_FILE = os.path.join(SCRIPT_DIR, "accounts.journal")
 CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.json")
 CSV_DIR = os.path.join(SCRIPT_DIR, "csv")

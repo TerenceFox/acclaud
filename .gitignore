@@ -1,3 +1,4 @@
 # Don't commit raw bank exports
 csv/*.csv
 csv/*.CSV
+.env

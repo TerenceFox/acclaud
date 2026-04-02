@@ -33,11 +33,11 @@ All commands default to the previous month when no period is given.
 | `ACCLAUD_VAULT` | Output directory for monthly reports | `.` (current directory) |
 | `ACCLAUD_ATTACHMENTS` | Output directory for report images | same as vault |
 
-Example shell config:
+Configure in `.env` (created on first run, excluded from git):
 
 ```sh
-export ACCLAUD_VAULT="$HOME/notes/02 Areas/Budget"
-export ACCLAUD_ATTACHMENTS="$HOME/notes/attachments"
+ACCLAUD_VAULT=~/notes/02 Areas/Budget
+ACCLAUD_ATTACHMENTS=~/notes/attachments
 ```
 
 ### Importing
@@ -66,21 +66,21 @@ Acclaud requires Python 3, hledger, Claude Code, and a couple of Python packages
 
 ```sh
 sudo pacman -S hledger python python-plotly
-pip install kaleido
+pip install kaleido python-dotenv
 ```
 
 ### Debian / Ubuntu / WSL
 
 ```sh
 sudo apt update && sudo apt install hledger python3 python3-pip
-pip install plotly kaleido
+pip install plotly kaleido python-dotenv
 ```
 
 ### macOS
 
 ```sh
 brew install hledger python
-pip3 install plotly kaleido
+pip3 install plotly kaleido python-dotenv
 ```
 
 ### Claude Code
