@@ -21,7 +21,23 @@ The setup wizard walks you through adding your bank accounts, credit cards, loan
 ./acclaud monthly "2026-03"                # monthly expense totals
 ./acclaud cashflow "2026-03"               # cash flow statement
 ./acclaud sankey "2026-03"                 # sankey diagram (opens in browser)
-./acclaud report "2026-03" ./out ./att     # full monthly Obsidian report
+./acclaud report "2026-03"                 # full monthly Obsidian report
+```
+
+All commands default to the previous month when no period is given.
+
+### Environment variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `ACCLAUD_VAULT` | Output directory for monthly reports | `.` (current directory) |
+| `ACCLAUD_ATTACHMENTS` | Output directory for report images | same as vault |
+
+Example shell config:
+
+```sh
+export ACCLAUD_VAULT="$HOME/notes/02 Areas/Budget"
+export ACCLAUD_ATTACHMENTS="$HOME/notes/attachments"
 ```
 
 ### Importing
@@ -41,21 +57,6 @@ Claude categorizes each transaction into the appropriate expense account. Existi
 - Income statement and cash flow
 - Sankey diagram of expenses (PNG)
 - Per-category transaction tables, sorted largest to smallest
-
-## Makefile
-
-Wraps all commands, defaulting to the previous month:
-
-```sh
-make setup           # run onboarding wizard
-make import          # import all CSVs
-make balance         # last month's balances
-make expenses        # last month's expense breakdown
-make sankey          # sankey diagram in browser
-make report          # full monthly report to Obsidian vault
-make clean-csv       # clear csv/ after importing
-make MONTH=2026-03 report  # override month
-```
 
 ## Installation
 
