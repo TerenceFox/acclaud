@@ -29,14 +29,14 @@ import webbrowser
 from datetime import date, timedelta
 from dotenv import load_dotenv
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-JOURNAL = os.path.join(SCRIPT_DIR, "budget.journal")
-TRANSACTIONS = os.path.join(SCRIPT_DIR, "transactions.journal")
+PROJECT_DIR = os.getcwd()
+JOURNAL = os.path.join(PROJECT_DIR, "budget.journal")
+TRANSACTIONS = os.path.join(PROJECT_DIR, "transactions.journal")
 
-load_dotenv(os.path.join(SCRIPT_DIR, ".env"))
-ACCOUNTS_FILE = os.path.join(SCRIPT_DIR, "accounts.journal")
-CONFIG_PATH = os.path.join(SCRIPT_DIR, "config.json")
-CSV_DIR = os.path.join(SCRIPT_DIR, "csv")
+load_dotenv(os.path.join(PROJECT_DIR, ".env"))
+ACCOUNTS_FILE = os.path.join(PROJECT_DIR, "accounts.journal")
+CONFIG_PATH = os.path.join(PROJECT_DIR, "config.json")
+CSV_DIR = os.path.join(PROJECT_DIR, "csv")
 
 
 # ---------------------------------------------------------------------------
@@ -396,7 +396,7 @@ def cmd_report(args):
         first = date.today().replace(day=1)
         year_month = (first - timedelta(days=1)).strftime("%Y-%m")
 
-    output_dir = os.path.expanduser(args[1] if len(args) > 1 else os.environ.get("ACCLAUD_OUTPUT", os.path.join(SCRIPT_DIR, "output")))
+    output_dir = os.path.expanduser(args[1] if len(args) > 1 else os.environ.get("ACCLAUD_OUTPUT", os.path.join(PROJECT_DIR, "output")))
     attachments_dir = os.path.expanduser(args[2] if len(args) > 2 else os.environ.get("ACCLAUD_ATTACHMENTS", output_dir))
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(attachments_dir, exist_ok=True)

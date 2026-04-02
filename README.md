@@ -60,41 +60,31 @@ Claude categorizes each transaction into the appropriate expense account. Existi
 
 ## Installation
 
-Acclaud requires Python 3, hledger, Claude Code, and a couple of Python packages.
+Requires Python 3.9+, hledger, and Claude Code.
 
-### Arch Linux
+### 1. Install hledger
 
-```sh
-sudo pacman -S hledger python python-plotly
-pip install kaleido python-dotenv
-```
+- **Arch**: `sudo pacman -S hledger`
+- **Debian/Ubuntu/WSL**: `sudo apt install hledger`
+- **macOS**: `brew install hledger`
 
-### Debian / Ubuntu / WSL
-
-```sh
-sudo apt update && sudo apt install hledger python3 python3-pip
-pip install plotly kaleido python-dotenv
-```
-
-### macOS
-
-```sh
-brew install hledger python
-pip3 install plotly kaleido python-dotenv
-```
-
-### Claude Code
-
-Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (required for transaction categorization):
+### 2. Install Claude Code
 
 ```sh
 npm install -g @anthropic-ai/claude-code
 ```
 
-### Clone and run
+### 3. Install Acclaud
 
 ```sh
-git clone https://github.com/youruser/acclaud.git
-cd acclaud
-./acclaud setup
+pip install git+https://github.com/youruser/acclaud.git
+```
+
+Python dependencies (plotly, kaleido, python-dotenv) are installed automatically.
+
+### 4. Set up your accounts
+
+```sh
+mkdir my-budget && cd my-budget
+acclaud setup
 ```
