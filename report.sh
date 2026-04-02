@@ -10,6 +10,7 @@
 #   monthly    - Monthly expense totals
 #   cashflow   - Cash flow statement
 #   sankey     - Sankey diagram of expenses (opens in browser)
+#   report     - Full monthly report as Obsidian markdown (period = YYYY-MM)
 #
 # Period examples: "this month", "last month", "2026Q1", "2026"
 
@@ -44,9 +45,12 @@ case "$CMD" in
     sankey)
         python3 "$(dirname "$0")/sankey.py" "${PERIOD:-this month}"
         ;;
+    report)
+        python3 "$(dirname "$0")/monthly-report.py" "${PERIOD}" "${3:-.}"
+        ;;
     *)
         echo "Unknown command: $CMD"
-        echo "Available: balance, expenses, income, monthly, cashflow, sankey"
+        echo "Available: balance, expenses, income, monthly, cashflow, sankey, report"
         exit 1
         ;;
 esac

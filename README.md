@@ -65,9 +65,21 @@ The importer also reads existing transactions to build a merchant-to-category ma
 ./report.sh monthly                  # monthly expense totals
 ./report.sh cashflow                 # cash flow statement
 ./report.sh sankey "2026-03"         # sankey diagram (opens in browser)
+./report.sh report "2026-03"         # full monthly report (Obsidian markdown)
+./report.sh report "2026-03" ~/vault/budget  # output to a specific directory
 ```
 
 All commands accept an optional period argument: `"last month"`, `"2026Q1"`, `"2026"`, etc.
+
+### Monthly report
+
+`./monthly-report.py YYYY-MM [output-dir]` generates a full Obsidian-flavored markdown report containing:
+
+- Summary table (income, expenses, net)
+- Account balances
+- Income statement and cash flow
+- Sankey diagram of expenses (embedded HTML)
+- Per-category transaction tables, sorted largest to smallest
 
 ## Dependencies
 
