@@ -57,9 +57,43 @@ make clean-csv       # clear csv/ after importing
 make MONTH=2026-03 report  # override month
 ```
 
-## Dependencies
+## Installation
 
-- [hledger](https://hledger.org/) — `sudo pacman -S hledger`
-- [Claude Code](https://claude.ai/claude-code) — used for transaction categorization
-- [plotly](https://plotly.com/python/) — `sudo pacman -S python-plotly` — sankey diagrams
-- [kaleido](https://github.com/nicmcd/kaleido) — `pip install kaleido` — PNG export
+Acclaud requires Python 3, hledger, Claude Code, and a couple of Python packages.
+
+### Arch Linux
+
+```sh
+sudo pacman -S hledger python python-plotly
+pip install kaleido
+```
+
+### Debian / Ubuntu / WSL
+
+```sh
+sudo apt update && sudo apt install hledger python3 python3-pip
+pip install plotly kaleido
+```
+
+### macOS
+
+```sh
+brew install hledger python
+pip3 install plotly kaleido
+```
+
+### Claude Code
+
+Install [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (required for transaction categorization):
+
+```sh
+npm install -g @anthropic-ai/claude-code
+```
+
+### Clone and run
+
+```sh
+git clone https://github.com/youruser/acclaud.git
+cd acclaud
+./acclaud setup
+```
