@@ -724,6 +724,10 @@ def main():
         print(f"Available: {', '.join(dict.fromkeys(COMMANDS.keys()))}")
         sys.exit(1)
 
+    if cmd != "setup" and not os.path.isfile(CONFIG_PATH):
+        print("No config.json found. Run 'acclaud setup' first.")
+        sys.exit(1)
+
     COMMANDS[cmd](args)
 
 
