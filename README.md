@@ -21,7 +21,7 @@ npm install -g @anthropic-ai/claude-code
 ### 3. Install Acclaud
 
 ```sh
-pip install git+https://github.com/youruser/acclaud.git
+pip install git+https://github.com/TerenceFox/acclaud
 ```
 
 Python dependencies (plotly, kaleido, python-dotenv) are installed automatically.
