@@ -21,11 +21,12 @@ ACCOUNTS=$(grep '^account expenses:' "$ACCOUNTS_FILE")
 #   ally-checking.csv, ally-savings.csv, capital-one-checking.csv
 resolve_account() {
     local basename
-    basename=$(basename "$1" .csv)
+    basename=$(basename "$1")
+    basename="${basename%.[cC][sS][vV]}"
     basename=$(echo "$basename" | tr '[:upper:]' '[:lower:]')
 
     case "$basename" in
-        *chase*amazon*|*amazon*visa*)
+        *chase*amazon*|*amazon*visa*|*chase*visa*)
             echo "liabilities:chase amazon visa" ;;
         *apple*card*)
             echo "liabilities:apple card" ;;
@@ -66,6 +67,14 @@ classify_and_append() {
     local csv_content
     csv_content=$(<"$csvfile")
 
+    # Build merchant → category mapping from existing transactions
+    # Extracts "description → expense account" pairs for consistency
+    local merchant_map
+    merchant_map=$(awk '
+        /^[0-9][0-9][0-9][0-9]-/ { desc = substr($0, 12) }
+        /^    expenses:/ { line = $0; gsub(/^    /, "", line); gsub(/  +-?\$.*/, "", line); if (desc != "") print desc " -> " line }
+    ' "$JOURNAL" | sort -u)
+
     # Ask Claude to parse the CSV and produce hledger journal entries
     local prompt
     prompt=$(cat <<PROMPT
@@ -83,10 +92,14 @@ account liabilities:apple card
 account income:salary
 account income:other
 
+PREVIOUS MERCHANT CATEGORIZATIONS (use these to stay consistent — always categorize a merchant the same way):
+$merchant_map
+
 CSV CONTENT:
 $csv_content
 
 INSTRUCTIONS:
+- If a merchant matches or closely matches one from the PREVIOUS MERCHANT CATEGORIZATIONS list, use the same expense account.
 - Parse every transaction row from the CSV.
 - For each transaction, produce a valid hledger journal entry.
 - Use your best judgment to assign each transaction to the single most appropriate expense account based on the merchant/description.
@@ -96,7 +109,9 @@ INSTRUCTIONS:
 - Use USD with \$ symbol, e.g. \$50.00
 - Format dates as YYYY-MM-DD (infer the year from context if not present).
 - Use the merchant/description as the transaction description (clean it up to be human-readable).
-- Output ONLY valid hledger journal entries, one blank line between each. No commentary.
+- Output ONLY valid hledger journal entries, one blank line between each. No commentary, no explanations, no markdown.
+- Do NOT wrap output in code fences (no \`\`\` or \`\`\`hledger or \`\`\`journal). Output raw hledger text only.
+- If the CSV is empty or has no transactions, output nothing at all.
 
 SIGN CONVENTIONS (important for hledger):
 - This is a $acct_type account ($hledger_account).
@@ -119,9 +134,14 @@ PROMPT
     local result
     result=$(echo "$prompt" | claude --print 2>/dev/null)
 
+    # Strip markdown code fences and any non-journal prose
+    result=$(echo "$result" | sed '/^```/d')
+    # Remove lines that don't look like journal entries (dates, postings, comments, or blank lines)
+    result=$(echo "$result" | grep -E '^(;|[0-9]{4}-|    [a-z]|$)' || true)
+
     if [[ -z "$result" ]]; then
-        echo "ERROR: Claude returned empty response for $csvfile" >&2
-        return 1
+        echo "SKIP: No transactions found in $csvfile"
+        return 0
     fi
 
     # Append to journal with a header comment

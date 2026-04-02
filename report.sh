@@ -9,6 +9,7 @@
 #   income     - Income statement (income & expenses)
 #   monthly    - Monthly expense totals
 #   cashflow   - Cash flow statement
+#   sankey     - Sankey diagram of expenses (opens in browser)
 #
 # Period examples: "this month", "last month", "2026Q1", "2026"
 
@@ -40,9 +41,12 @@ case "$CMD" in
     cashflow|cf)
         hledger -f "$JOURNAL" cf "${period_args[@]}"
         ;;
+    sankey)
+        python3 "$(dirname "$0")/sankey.py" "${PERIOD:-this month}"
+        ;;
     *)
         echo "Unknown command: $CMD"
-        echo "Available: balance, expenses, income, monthly, cashflow"
+        echo "Available: balance, expenses, income, monthly, cashflow, sankey"
         exit 1
         ;;
 esac
