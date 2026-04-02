@@ -1,36 +1,35 @@
 MONTH := $(shell date -d '1 month ago' +%Y-%m)
-JOURNAL := budget.journal
 VAULT := $(HOME)/notes/02 Areas/Budget
 ATTACHMENTS := $(HOME)/notes/attachments
 
 .PHONY: setup import balance expenses income monthly cashflow sankey report clean-csv
 
 setup:
-	./setup.py
+	./claudit setup
 
 import:
-	./import.sh
+	./claudit import
 
 balance:
-	./report.sh balance "$(MONTH)"
+	./claudit balance "$(MONTH)"
 
 expenses:
-	./report.sh expenses "$(MONTH)"
+	./claudit expenses "$(MONTH)"
 
 income:
-	./report.sh income "$(MONTH)"
+	./claudit income "$(MONTH)"
 
 monthly:
-	./report.sh monthly "$(MONTH)"
+	./claudit monthly "$(MONTH)"
 
 cashflow:
-	./report.sh cashflow "$(MONTH)"
+	./claudit cashflow "$(MONTH)"
 
 sankey:
-	./report.sh sankey "$(MONTH)"
+	./claudit sankey "$(MONTH)"
 
 report:
-	./monthly-report.py "$(MONTH)" "$(VAULT)" "$(ATTACHMENTS)"
+	./claudit report "$(MONTH)" "$(VAULT)" "$(ATTACHMENTS)"
 
 clean-csv:
 	rm -f csv/*.csv csv/*.CSV

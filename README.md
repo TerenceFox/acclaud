@@ -1,61 +1,50 @@
 # Claudit
 
-Personal finance tracking with [hledger](https://hledger.org/) and AI-powered transaction categorization.
+AI-powered personal finance tracking with [hledger](https://hledger.org/) and [Claude](https://claude.ai/claude-code).
 
 ## Getting started
 
-Run the setup wizard to configure your accounts:
-
 ```sh
-make setup
+./claudit setup
 ```
 
-This walks you through adding your bank accounts, credit cards, loans, and expense categories. It generates `config.json` and `accounts.journal`.
+The setup wizard walks you through adding your bank accounts, credit cards, loans, and expense categories.
 
-## Importing transactions
+## Usage
+
+```sh
+./claudit import                           # import all CSVs in csv/
+./claudit import csv/ally-checking.csv     # import one file
+./claudit balance "2026-03"                # account balances
+./claudit expenses "this month"            # expense breakdown
+./claudit income "2026-03"                 # income statement
+./claudit monthly "2026-03"                # monthly expense totals
+./claudit cashflow "2026-03"               # cash flow statement
+./claudit sankey "2026-03"                 # sankey diagram (opens in browser)
+./claudit report "2026-03" ./out ./att     # full monthly Obsidian report
+```
+
+### Importing
 
 1. Export a CSV from your bank or credit card
 2. Drop it into `csv/` with a filename matching your account (configured during setup)
-3. Run the import:
+3. Run `./claudit import`
 
-```sh
-./import.sh                        # process all CSVs in csv/
-./import.sh csv/ally-checking.csv  # process one file
-```
-
-The script sends each CSV to Claude, which categorizes every transaction into the appropriate expense account and outputs valid hledger entries. Results are appended to `transactions.journal`.
-
-The importer also reads existing transactions to build a merchant-to-category mapping, ensuring merchants are always categorized consistently across imports.
-
-## Reports
-
-```sh
-./report.sh balance                  # all account balances
-./report.sh expenses                 # expense breakdown
-./report.sh expenses "this month"    # expense breakdown for current month
-./report.sh income                   # income statement
-./report.sh monthly                  # monthly expense totals
-./report.sh cashflow                 # cash flow statement
-./report.sh sankey "2026-03"         # sankey diagram (opens in browser)
-./report.sh report "2026-03"         # full monthly report (Obsidian markdown)
-./report.sh report "2026-03" ~/vault/budget  # output to a specific directory
-```
-
-All commands accept an optional period argument: `"last month"`, `"2026Q1"`, `"2026"`, etc.
+Claude categorizes each transaction into the appropriate expense account. Existing transactions are used to build a merchant-to-category mapping, ensuring consistent categorization across imports.
 
 ### Monthly report
 
-`./monthly-report.py YYYY-MM [output-dir] [attachments-dir]` generates a full Obsidian-flavored markdown report containing:
+`./claudit report` generates an Obsidian-flavored markdown report with:
 
 - Summary table (income, expenses, net)
 - Account balances
 - Income statement and cash flow
-- Sankey diagram of expenses (PNG image)
+- Sankey diagram of expenses (PNG)
 - Per-category transaction tables, sorted largest to smallest
 
 ## Makefile
 
-A Makefile wraps all commands, defaulting to the previous month:
+Wraps all commands, defaulting to the previous month:
 
 ```sh
 make setup           # run onboarding wizard
@@ -71,7 +60,6 @@ make MONTH=2026-03 report  # override month
 ## Dependencies
 
 - [hledger](https://hledger.org/) — `sudo pacman -S hledger`
-- [jq](https://jqlang.github.io/jq/) — `sudo pacman -S jq` — used by `import.sh` to read config
-- [Claude Code](https://claude.ai/claude-code) — used by `import.sh` for transaction categorization
-- [plotly](https://plotly.com/python/) — `sudo pacman -S python-plotly` — used by `sankey.py` for visualizations
-- [kaleido](https://github.com/nicmcd/kaleido) — `pip install kaleido` — used for sankey PNG export
+- [Claude Code](https://claude.ai/claude-code) — used for transaction categorization
+- [plotly](https://plotly.com/python/) — `sudo pacman -S python-plotly` — sankey diagrams
+- [kaleido](https://github.com/nicmcd/kaleido) — `pip install kaleido` — PNG export
