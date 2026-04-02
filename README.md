@@ -1,11 +1,11 @@
-# Claudit
+# Acclaud
 
 AI-powered personal finance tracking with [hledger](https://hledger.org/) and [Claude](https://claude.ai/claude-code).
 
 ## Getting started
 
 ```sh
-./claudit setup
+./acclaud setup
 ```
 
 The setup wizard walks you through adding your bank accounts, credit cards, loans, and expense categories.
@@ -13,28 +13,28 @@ The setup wizard walks you through adding your bank accounts, credit cards, loan
 ## Usage
 
 ```sh
-./claudit import                           # import all CSVs in csv/
-./claudit import csv/ally-checking.csv     # import one file
-./claudit balance "2026-03"                # account balances
-./claudit expenses "this month"            # expense breakdown
-./claudit income "2026-03"                 # income statement
-./claudit monthly "2026-03"                # monthly expense totals
-./claudit cashflow "2026-03"               # cash flow statement
-./claudit sankey "2026-03"                 # sankey diagram (opens in browser)
-./claudit report "2026-03" ./out ./att     # full monthly Obsidian report
+./acclaud import                           # import all CSVs in csv/
+./acclaud import csv/ally-checking.csv     # import one file
+./acclaud balance "2026-03"                # account balances
+./acclaud expenses "this month"            # expense breakdown
+./acclaud income "2026-03"                 # income statement
+./acclaud monthly "2026-03"                # monthly expense totals
+./acclaud cashflow "2026-03"               # cash flow statement
+./acclaud sankey "2026-03"                 # sankey diagram (opens in browser)
+./acclaud report "2026-03" ./out ./att     # full monthly Obsidian report
 ```
 
 ### Importing
 
 1. Export a CSV from your bank or credit card
 2. Drop it into `csv/` with a filename matching your account (configured during setup)
-3. Run `./claudit import`
+3. Run `./acclaud import`
 
 Claude categorizes each transaction into the appropriate expense account. Existing transactions are used to build a merchant-to-category mapping, ensuring consistent categorization across imports.
 
 ### Monthly report
 
-`./claudit report` generates an Obsidian-flavored markdown report with:
+`./acclaud report` generates an Obsidian-flavored markdown report with:
 
 - Summary table (income, expenses, net)
 - Account balances

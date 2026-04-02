@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Claudit — AI-powered personal finance tracking with hledger.
+"""Acclaud — AI-powered personal finance tracking with hledger.
 
 Usage:
-    claudit setup                              Configure accounts interactively
-    claudit import [file.csv]                  Import CSV transactions
-    claudit balance [period]                   Account balances
-    claudit expenses [period]                  Expense breakdown
-    claudit income [period]                    Income statement
-    claudit monthly [period]                   Monthly expense totals
-    claudit cashflow [period]                  Cash flow statement
-    claudit sankey [period]                    Sankey diagram (opens in browser)
-    claudit report [YYYY-MM] [dir] [att-dir]   Full monthly Obsidian report
+    acclaud setup                              Configure accounts interactively
+    acclaud import [file.csv]                  Import CSV transactions
+    acclaud balance [period]                   Account balances
+    acclaud expenses [period]                  Expense breakdown
+    acclaud income [period]                    Income statement
+    acclaud monthly [period]                   Monthly expense totals
+    acclaud cashflow [period]                  Cash flow statement
+    acclaud sankey [period]                    Sankey diagram (opens in browser)
+    acclaud report [YYYY-MM] [dir] [att-dir]   Full monthly Obsidian report
 """
 
 import fnmatch
@@ -38,7 +38,7 @@ CSV_DIR = os.path.join(SCRIPT_DIR, "csv")
 
 def load_config():
     if not os.path.exists(CONFIG_PATH):
-        print("No config.json found. Run: claudit setup", file=sys.stderr)
+        print("No config.json found. Run: acclaud setup", file=sys.stderr)
         sys.exit(1)
     with open(CONFIG_PATH) as f:
         return json.load(f)
@@ -617,7 +617,7 @@ include transactions.journal
 
 def cmd_setup(_args):
     print("=" * 50)
-    print("  Claudit Setup Wizard")
+    print("  Acclaud Setup Wizard")
     print("=" * 50)
 
     if os.path.exists(CONFIG_PATH):
@@ -678,7 +678,7 @@ def cmd_setup(_args):
 
     print("\n" + "=" * 50)
     print("Setup complete!")
-    print("Drop CSVs into csv/ and run: claudit import")
+    print("Drop CSVs into csv/ and run: acclaud import")
     print("=" * 50)
 
 

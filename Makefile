@@ -5,31 +5,31 @@ ATTACHMENTS := $(HOME)/notes/attachments
 .PHONY: setup import balance expenses income monthly cashflow sankey report clean-csv
 
 setup:
-	./claudit setup
+	./acclaud setup
 
 import:
-	./claudit import
+	./acclaud import
 
 balance:
-	./claudit balance "$(MONTH)"
+	./acclaud balance "$(MONTH)"
 
 expenses:
-	./claudit expenses "$(MONTH)"
+	./acclaud expenses "$(MONTH)"
 
 income:
-	./claudit income "$(MONTH)"
+	./acclaud income "$(MONTH)"
 
 monthly:
-	./claudit monthly "$(MONTH)"
+	./acclaud monthly "$(MONTH)"
 
 cashflow:
-	./claudit cashflow "$(MONTH)"
+	./acclaud cashflow "$(MONTH)"
 
 sankey:
-	./claudit sankey "$(MONTH)"
+	./acclaud sankey "$(MONTH)"
 
 report:
-	./claudit report "$(MONTH)" "$(VAULT)" "$(ATTACHMENTS)"
+	./acclaud report "$(MONTH)" "$(VAULT)" "$(ATTACHMENTS)"
 
 clean-csv:
 	rm -f csv/*.csv csv/*.CSV
