@@ -2,48 +2,20 @@
 
 Personal finance tracking with [hledger](https://hledger.org/) and AI-powered transaction categorization.
 
-## Journal structure
+## Getting started
 
-- `budget.journal` — entry point; sets USD commodity and includes the other files
-- `accounts.journal` — account and expense category declarations
-- `transactions.journal` — all transaction entries
+Run the setup wizard to configure your accounts:
 
-## Accounts
+```sh
+make setup
+```
 
-**Assets (bank accounts):**
-- `assets:ally checking`
-- `assets:ally savings`
-- `assets:capital one checking`
-- `assets:cash`
-
-**Liabilities (credit cards & loans):**
-- `liabilities:chase amazon visa`
-- `liabilities:apple card`
-- `liabilities:achieve personal loan`
-
-**Income:**
-- `income:salary`
-- `income:other`
-
-**Expenses (8 categories):**
-- `expenses:housing` — rent, mortgage, utilities, internet, insurance, repairs
-- `expenses:food` — groceries, restaurants, coffee, delivery
-- `expenses:transportation` — gas, parking, transit, rideshare, car maintenance
-- `expenses:shopping` — clothing, electronics, household goods, retail
-- `expenses:subscriptions` — streaming, software, memberships, recurring
-- `expenses:travel` — flights, hotels, foreign ATM, travel expenses
-- `expenses:health` — medical, pharmacy, dental
-- `expenses:other` — gifts, fees, everything else
+This walks you through adding your bank accounts, credit cards, loans, and expense categories. It generates `config.json` and `accounts.journal`.
 
 ## Importing transactions
 
 1. Export a CSV from your bank or credit card
-2. Drop it into `csv/` with a recognizable filename:
-   - `ally-checking.csv`
-   - `ally-savings.csv`
-   - `capital-one-checking.csv`
-   - `chase-amazon-visa.csv`
-   - `apple-card.csv`
+2. Drop it into `csv/` with a filename matching your account (configured during setup)
 3. Run the import:
 
 ```sh
@@ -86,6 +58,7 @@ All commands accept an optional period argument: `"last month"`, `"2026Q1"`, `"2
 A Makefile wraps all commands, defaulting to the previous month:
 
 ```sh
+make setup           # run onboarding wizard
 make import          # import all CSVs
 make balance         # last month's balances
 make expenses        # last month's expense breakdown
@@ -98,6 +71,7 @@ make MONTH=2026-03 report  # override month
 ## Dependencies
 
 - [hledger](https://hledger.org/) — `sudo pacman -S hledger`
+- [jq](https://jqlang.github.io/jq/) — `sudo pacman -S jq` — used by `import.sh` to read config
 - [Claude Code](https://claude.ai/claude-code) — used by `import.sh` for transaction categorization
 - [plotly](https://plotly.com/python/) — `sudo pacman -S python-plotly` — used by `sankey.py` for visualizations
 - [kaleido](https://github.com/nicmcd/kaleido) — `pip install kaleido` — used for sankey PNG export

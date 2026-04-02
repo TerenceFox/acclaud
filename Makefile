@@ -3,7 +3,10 @@ JOURNAL := budget.journal
 VAULT := $(HOME)/notes/02 Areas/Budget
 ATTACHMENTS := $(HOME)/notes/attachments
 
-.PHONY: import balance expenses income monthly cashflow sankey report clean-csv
+.PHONY: setup import balance expenses income monthly cashflow sankey report clean-csv
+
+setup:
+	./setup.py
 
 import:
 	./import.sh

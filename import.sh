@@ -12,34 +12,48 @@ cd "$(dirname "$0")"
 JOURNAL="transactions.journal"
 CSV_DIR="csv"
 ACCOUNTS_FILE="accounts.journal"
+CONFIG="config.json"
+
+if [[ ! -f "$CONFIG" ]]; then
+    echo "No config.json found. Run: make setup" >&2
+    exit 1
+fi
+
+# Read config
+CURRENCY_SYMBOL=$(jq -r '.currency_symbol' "$CONFIG")
 
 # Read account definitions so Claude knows the valid categories
 ACCOUNTS=$(grep '^account expenses:' "$ACCOUNTS_FILE")
 
-# Map CSV filename to hledger account
-# Expected filenames: chase-amazon-visa.csv, apple-card.csv,
-#   ally-checking.csv, ally-savings.csv, capital-one-checking.csv
+# Build full account list for Claude prompt
+ALL_ACCOUNTS=$(jq -r '
+    ( [.accounts.assets[]      | "account assets:" + .name] +
+      [.accounts.liabilities[] | "account liabilities:" + .name] +
+      [.accounts.income[]      | "account income:" + .] )
+    | .[]
+' "$CONFIG")
+
+# Map CSV filename to hledger account via config.json
 resolve_account() {
     local basename
     basename=$(basename "$1")
     basename="${basename%.[cC][sS][vV]}"
     basename=$(echo "$basename" | tr '[:upper:]' '[:lower:]')
 
-    case "$basename" in
-        *chase*amazon*|*amazon*visa*|*chase*visa*)
-            echo "liabilities:chase amazon visa" ;;
-        *apple*card*)
-            echo "liabilities:apple card" ;;
-        *ally*check*)
-            echo "assets:ally checking" ;;
-        *ally*sav*)
-            echo "assets:ally savings" ;;
-        *capital*one*check*)
-            echo "assets:capital one checking" ;;
-        *)
-            echo ""
-            return 1 ;;
-    esac
+    local account
+    account=$(jq -r --arg name "$basename" '
+        ( [.accounts.assets[]      | select(.csv_patterns?) | {account: ("assets:" + .name), patterns: .csv_patterns}] +
+          [.accounts.liabilities[] | select(.csv_patterns?) | {account: ("liabilities:" + .name), patterns: .csv_patterns}] )
+        | .[]
+        | select(.patterns[] as $p | $name | test($p | gsub("\\*"; ".*")))
+        | .account
+    ' "$CONFIG" | head -1)
+
+    if [[ -z "$account" ]]; then
+        echo ""
+        return 1
+    fi
+    echo "$account"
 }
 
 account_type() {
@@ -84,13 +98,7 @@ EXPENSE ACCOUNTS:
 $ACCOUNTS
 
 OTHER ACCOUNTS (use only if a transaction is a transfer between accounts):
-account assets:ally checking
-account assets:ally savings
-account assets:capital one checking
-account liabilities:chase amazon visa
-account liabilities:apple card
-account income:salary
-account income:other
+$ALL_ACCOUNTS
 
 PREVIOUS MERCHANT CATEGORIZATIONS (use these to stay consistent — always categorize a merchant the same way):
 $merchant_map
@@ -106,7 +114,7 @@ INSTRUCTIONS:
 - For income/deposits, use the appropriate income account.
 - For transfers between accounts (e.g. payment to credit card, transfer between checking/savings), use the appropriate other account — NOT an expense account.
 - The balancing account for all non-transfer transactions is: $hledger_account
-- Use USD with \$ symbol, e.g. \$50.00
+- Use the $CURRENCY_SYMBOL symbol for amounts, e.g. ${CURRENCY_SYMBOL}50.00
 - Format dates as YYYY-MM-DD (infer the year from context if not present).
 - Use the merchant/description as the transaction description (clean it up to be human-readable).
 - Output ONLY valid hledger journal entries, one blank line between each. No commentary, no explanations, no markdown.
