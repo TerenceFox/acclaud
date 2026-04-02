@@ -73,16 +73,31 @@ All commands accept an optional period argument: `"last month"`, `"2026Q1"`, `"2
 
 ### Monthly report
 
-`./monthly-report.py YYYY-MM [output-dir]` generates a full Obsidian-flavored markdown report containing:
+`./monthly-report.py YYYY-MM [output-dir] [attachments-dir]` generates a full Obsidian-flavored markdown report containing:
 
 - Summary table (income, expenses, net)
 - Account balances
 - Income statement and cash flow
-- Sankey diagram of expenses (embedded HTML)
+- Sankey diagram of expenses (PNG image)
 - Per-category transaction tables, sorted largest to smallest
+
+## Makefile
+
+A Makefile wraps all commands, defaulting to the previous month:
+
+```sh
+make import          # import all CSVs
+make balance         # last month's balances
+make expenses        # last month's expense breakdown
+make sankey          # sankey diagram in browser
+make report          # full monthly report to Obsidian vault
+make clean-csv       # clear csv/ after importing
+make MONTH=2026-03 report  # override month
+```
 
 ## Dependencies
 
 - [hledger](https://hledger.org/) — `sudo pacman -S hledger`
 - [Claude Code](https://claude.ai/claude-code) — used by `import.sh` for transaction categorization
 - [plotly](https://plotly.com/python/) — `sudo pacman -S python-plotly` — used by `sankey.py` for visualizations
+- [kaleido](https://github.com/nicmcd/kaleido) — `pip install kaleido` — used for sankey PNG export

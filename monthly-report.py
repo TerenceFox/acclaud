@@ -105,8 +105,8 @@ def get_transactions_for_category(category, period):
     return transactions
 
 
-def generate_sankey_html(period, output_path):
-    """Generate sankey diagram HTML file."""
+def generate_sankey(period, output_path):
+    """Generate sankey diagram as PNG image."""
     import plotly.graph_objects as go
 
     data = hledger_json("bal", "expenses", "--no-total", "--flat", "-p", period)
@@ -180,12 +180,16 @@ def generate_sankey_html(period, output_path):
         height=500,
     )
 
-    fig.write_html(output_path, auto_open=False)
+    fig.write_image(output_path, scale=2)
     return True
 
 
-def build_report(year_month, output_dir):
+def build_report(year_month, output_dir, attachments_dir=None):
     """Build the full monthly report."""
+    if attachments_dir is None:
+        attachments_dir = output_dir
+    os.makedirs(attachments_dir, exist_ok=True)
+
     period = get_month_period(year_month)
 
     # Gather data
@@ -195,9 +199,9 @@ def build_report(year_month, output_dir):
     expense_categories = get_expense_categories(period)
 
     # Generate sankey
-    sankey_filename = f"{year_month} Sankey.html"
-    sankey_path = os.path.join(output_dir, sankey_filename)
-    has_sankey = generate_sankey_html(period, sankey_path)
+    sankey_filename = f"{year_month} Sankey.png"
+    sankey_path = os.path.join(attachments_dir, sankey_filename)
+    has_sankey = generate_sankey(period, sankey_path)
 
     # Build markdown
     lines = []
@@ -301,9 +305,10 @@ def main():
         year_month = last_month.strftime("%Y-%m")
 
     output_dir = sys.argv[2] if len(sys.argv) > 2 else "."
+    attachments_dir = sys.argv[3] if len(sys.argv) > 3 else None
     os.makedirs(output_dir, exist_ok=True)
 
-    build_report(year_month, output_dir)
+    build_report(year_month, output_dir, attachments_dir)
 
 
 if __name__ == "__main__":
