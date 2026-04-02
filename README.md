@@ -1,4 +1,4 @@
-# Budget
+# Claudit
 
 Personal finance tracking with [hledger](https://hledger.org/) and AI-powered transaction categorization.
 
