@@ -12,9 +12,9 @@ Usage:
     acclaud sankey [period]                    Sankey diagram (opens in browser)
     acclaud report [YYYY-MM]                   Full monthly Obsidian report
 
-Environment variables:
-    ACCLAUD_OUTPUT         Output directory for monthly reports
-    ACCLAUD_ATTACHMENTS   Output directory for report images
+Config keys (in config.json):
+    output_dir            Output directory for monthly reports
+    attachments_dir       Output directory for report images
 """
 
 import fnmatch
@@ -28,13 +28,9 @@ import sys
 import tempfile
 import webbrowser
 from datetime import date, timedelta
-from dotenv import load_dotenv
-
 PROJECT_DIR = os.getcwd()
 JOURNAL = os.path.join(PROJECT_DIR, "budget.journal")
 TRANSACTIONS = os.path.join(PROJECT_DIR, "transactions.journal")
-
-load_dotenv(os.path.join(PROJECT_DIR, ".env"))
 ACCOUNTS_FILE = os.path.join(PROJECT_DIR, "accounts.journal")
 CONFIG_PATH = os.path.join(PROJECT_DIR, "config.json")
 CSV_DIR = os.path.join(PROJECT_DIR, "csv")
@@ -48,7 +44,7 @@ def load_config():
     if not os.path.exists(CONFIG_PATH):
         print("No config.json found. Run: acclaud setup", file=sys.stderr)
         sys.exit(1)
-    with open(CONFIG_PATH) as f:
+    with open(CONFIG_PATH, encoding="utf-8") as f:
         config = json.load(f)
     for key in ("currency", "currency_symbol", "accounts"):
         if key not in config:
@@ -86,7 +82,7 @@ def format_currency(value, symbol="$"):
 
 
 def ask(prompt, default=None):
-    if default:
+    if default is not None:
         result = input(f"{prompt} [{default}]: ").strip()
         return result if result else default
     return input(f"{prompt}: ").strip()
@@ -132,7 +128,7 @@ def build_merchant_map():
     """Extract merchant → expense account mapping from existing transactions."""
     mapping = {}
     desc = None
-    with open(TRANSACTIONS) as f:
+    with open(TRANSACTIONS, encoding="utf-8") as f:
         for line in f:
             if re.match(r"^\d{4}-", line):
                 desc = line[11:].strip()
@@ -250,11 +246,11 @@ def cmd_import(args):
         acct_type_str = account_type(account)
         print(f"  Account: {account} ({acct_type_str})")
 
-        with open(csvfile) as f:
+        with open(csvfile, encoding="utf-8") as f:
             csv_content = f.read()
 
         if not csv_content.strip():
-            print(f"  SKIP: Empty file")
+            print("  SKIP: Empty file")
             continue
 
         prompt = build_prompt(csv_content, account, acct_type_str, config, merchant_map)
@@ -268,7 +264,7 @@ def cmd_import(args):
 
         cleaned = clean_result(result.stdout)
         if not cleaned:
-            print(f"  SKIP: No transactions found")
+            print("  SKIP: No transactions found")
             continue
 
         tx_count = sum(1 for line in cleaned.splitlines() if re.match(r"^\d{4}-", line))
@@ -278,7 +274,7 @@ def cmd_import(args):
             print(cleaned)
             print(f"\n  (dry run: {tx_count} transactions not written)")
         else:
-            with open(TRANSACTIONS, "a") as f:
+            with open(TRANSACTIONS, "a", encoding="utf-8") as f:
                 f.write(f"\n; Imported from {os.path.basename(csvfile)} on {date.today()}\n")
                 f.write(cleaned + "\n")
             print(f"  Done: {tx_count} transactions imported")
@@ -419,8 +415,8 @@ def cmd_report(args):
         first = date.today().replace(day=1)
         year_month = (first - timedelta(days=1)).strftime("%Y-%m")
 
-    output_dir = os.path.expanduser(args[1] if len(args) > 1 else os.environ.get("ACCLAUD_OUTPUT", os.path.join(PROJECT_DIR, "output")))
-    attachments_dir = os.path.expanduser(args[2] if len(args) > 2 else os.environ.get("ACCLAUD_ATTACHMENTS", output_dir))
+    output_dir = os.path.expanduser(args[1] if len(args) > 1 else config.get("output_dir", os.path.join(PROJECT_DIR, "output")))
+    attachments_dir = os.path.expanduser(args[2] if len(args) > 2 else config.get("attachments_dir", output_dir))
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(attachments_dir, exist_ok=True)
 
@@ -454,7 +450,7 @@ def cmd_report(args):
     total_expenses = sum(v for _, v in expense_categories)
     total_income = sum(abs(v) for a, v in balances if a.startswith("income:"))
     net = total_income - total_expenses
-    fc = lambda v: format_currency(v, symbol)
+    def fc(v): return format_currency(v, symbol)
 
     lines = [
         "---",
@@ -520,7 +516,7 @@ def cmd_report(args):
 
     report_filename = f"{year_month} Budget Report.md"
     report_path = os.path.join(output_dir, report_filename)
-    with open(report_path, "w") as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
     print(f"Report: {report_path}")
@@ -624,7 +620,7 @@ def write_accounts_journal(config):
             lines.append(f"account expenses:{exp['name']}")
     lines.append("")
 
-    with open(ACCOUNTS_FILE, "w") as f:
+    with open(ACCOUNTS_FILE, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     print(f"Wrote {ACCOUNTS_FILE}")
 
@@ -640,9 +636,31 @@ commodity {symbol}1,000.00
 include accounts.journal
 include transactions.journal
 """
-    with open(JOURNAL, "w") as f:
+    with open(JOURNAL, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"Wrote {JOURNAL}")
+
+
+def setup_output_dirs(config):
+    """Optionally configure output directories in config.json."""
+    print("\n--- Output Directories (optional) ---")
+    print("Configure where monthly reports and images are saved.")
+    current_output = config.get("output_dir", "output/")
+    current_attachments = config.get("attachments_dir", "same as output")
+    print(f"  output_dir      — report markdown (current: {current_output})")
+    print(f"  attachments_dir — report images   (current: {current_attachments})")
+
+    if not yes_no("\nConfigure output directories?", default=False):
+        print("Skipped.")
+        return
+
+    output = ask("Report output directory", config.get("output_dir", ""))
+    attachments = ask("Attachments directory (Enter to use same as output)", config.get("attachments_dir", ""))
+
+    if output:
+        config["output_dir"] = output
+    if attachments:
+        config["attachments_dir"] = attachments
 
 
 def cmd_setup(_args):
@@ -699,7 +717,10 @@ def cmd_setup(_args):
         print("Aborted. Run again to start over.")
         return
 
-    with open(CONFIG_PATH, "w") as f:
+    # Output directories (optional, before writing config)
+    setup_output_dirs(config)
+
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2)
     print(f"\nWrote {CONFIG_PATH}")
 
@@ -764,10 +785,6 @@ def main():
     cmd = sys.argv[1]
     args = sys.argv[2:]
 
-    if cmd in ("-h", "--help"):
-        print(__doc__.strip())
-        sys.exit(0)
-
     if args and args[0] in ("-h", "--help"):
         if cmd in COMMAND_HELP:
             print(f"acclaud {cmd}: {COMMAND_HELP[cmd]}")
@@ -775,7 +792,7 @@ def main():
 
     if cmd not in COMMANDS:
         print(f"Unknown command: {cmd}", file=sys.stderr)
-        print(f"Available: {', '.join(dict.fromkeys(COMMANDS.keys()))}")
+        print(f"Available: {', '.join(dict.fromkeys(COMMANDS))}")
         sys.exit(1)
 
     if cmd != "setup" and not os.path.isfile(CONFIG_PATH):

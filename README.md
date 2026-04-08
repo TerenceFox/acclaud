@@ -45,7 +45,7 @@ Or install from source:
 pip install git+https://github.com/TerenceFox/acclaud
 ```
 
-Python dependencies (plotly, kaleido, python-dotenv) are installed automatically.
+Python dependencies (plotly, kaleido) are installed automatically.
 
 ## Getting started
 
@@ -54,7 +54,7 @@ mkdir my-budget && cd my-budget
 acclaud setup
 ```
 
-The setup wizard walks you through adding your bank accounts, credit cards, loans, and expense categories. All other commands require setup to be run first.
+The setup wizard walks you through adding your bank accounts, credit cards, loans, expense categories, and (optionally) output directories. Everything is stored in `config.json` in your project folder, so each directory is a self-contained budget — you can run multiple budgets on the same machine.
 
 ## Usage
 
@@ -93,17 +93,19 @@ Claude categorizes each transaction into the appropriate expense account. Existi
 
 ### Configuration
 
-Set output directories in a `.env` file in your project folder:
+Output directories can be configured during `acclaud setup` or by editing `config.json` directly:
 
-```sh
-ACCLAUD_OUTPUT=~/notes/02 Areas/Budget
-ACCLAUD_ATTACHMENTS=~/notes/attachments
+```json
+{
+  "output_dir": "~/notes/02 Areas/Budget",
+  "attachments_dir": "~/notes/attachments"
+}
 ```
 
-| Variable | Description | Default |
+| Key | Description | Default |
 |---|---|---|
-| `ACCLAUD_OUTPUT` | Output directory for reports and images | `output/` |
-| `ACCLAUD_ATTACHMENTS` | Optional separate directory for images | same as `ACCLAUD_OUTPUT` |
+| `output_dir` | Output directory for reports | `output/` |
+| `attachments_dir` | Optional separate directory for images | same as `output_dir` |
 
 ## Built with
 
