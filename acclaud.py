@@ -609,6 +609,10 @@ def write_accounts_journal(config):
         lines.append(f"account income:{name}")
     lines.append("")
 
+    lines.append("; Equity")
+    lines.append("account equity:opening balances")
+    lines.append("")
+
     lines.append("; Expenses")
     max_len = max(len(e["name"]) for e in config["accounts"]["expenses"])
     for exp in config["accounts"]["expenses"]:
@@ -634,11 +638,62 @@ def write_budget_journal(config):
 commodity {symbol}1,000.00
 
 include accounts.journal
+include opening.journal
 include transactions.journal
 """
     with open(JOURNAL, "w", encoding="utf-8") as f:
         f.write(content)
     print(f"Wrote {JOURNAL}")
+
+
+def setup_opening_balances(config):
+    """Optionally set opening balances for asset and liability accounts."""
+    symbol = config["currency_symbol"]
+    all_accounts = (
+        [(f"assets:{a['name']}", a['name']) for a in config["accounts"]["assets"]]
+        + [(f"liabilities:{a['name']}", a['name']) for a in config["accounts"]["liabilities"]]
+    )
+
+    if not all_accounts:
+        return
+
+    print("\n--- Opening Balances (optional) ---")
+    print("Set starting balances so reports show correct totals.")
+    print("For liabilities (credit cards), enter the amount owed as a negative number.")
+    print("You can skip this and add them later.")
+
+    if not yes_no("\nSet opening balances?", default=False):
+        print("Skipped.")
+        return
+
+    bal_date = ask("Balance date (YYYY-MM-DD)", date.today().strftime("%Y-%m-%d"))
+
+    entries = []
+    for full_name, display_name in all_accounts:
+        amount_str = ask(f"  {full_name}", "0")
+        try:
+            cleaned = amount_str.replace(",", "").replace(symbol, "").strip()
+            amount = float(cleaned)
+        except ValueError:
+            amount = 0
+        if amount != 0:
+            entries.append((full_name, amount))
+
+    if not entries:
+        print("No balances entered.")
+        return
+
+    opening_file = os.path.join(PROJECT_DIR, "opening.journal")
+    lines = [f"; Opening balances as of {bal_date}", ""]
+    for full_name, amount in entries:
+        lines.append(f"{bal_date} Opening balance")
+        lines.append(f"    {full_name:<40s}  {format_currency(amount, symbol)}")
+        lines.append(f"    equity:opening balances")
+        lines.append("")
+
+    with open(opening_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    print(f"Wrote {opening_file}")
 
 
 def setup_output_dirs(config):
@@ -726,6 +781,15 @@ def cmd_setup(_args):
 
     write_accounts_journal(config)
     write_budget_journal(config)
+
+    # Create empty opening.journal if it doesn't exist (so hledger include doesn't fail)
+    opening_file = os.path.join(PROJECT_DIR, "opening.journal")
+    if not os.path.exists(opening_file):
+        with open(opening_file, "w", encoding="utf-8") as f:
+            f.write("; Opening balances (use acclaud setup to populate)\n")
+
+    # Opening balances (optional)
+    setup_opening_balances(config)
 
     print("\n" + "=" * 50)
     print("Setup complete!")

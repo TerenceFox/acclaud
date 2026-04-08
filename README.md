@@ -54,7 +54,7 @@ mkdir my-budget && cd my-budget
 acclaud setup
 ```
 
-The setup wizard walks you through adding your bank accounts, credit cards, loans, expense categories, and (optionally) output directories. Everything is stored in `config.json` in your project folder, so each directory is a self-contained budget — you can run multiple budgets on the same machine.
+The setup wizard walks you through adding your bank accounts, credit cards, loans, expense categories, opening balances, and output directories. Everything is stored in `config.json` in your project folder, so each directory is a self-contained budget — you can run multiple budgets on the same machine.
 
 ## Usage
 
@@ -90,6 +90,10 @@ Claude categorizes each transaction into the appropriate expense account. Existi
 - Income statement and cash flow
 - Sankey diagram of expenses (PNG)
 - Per-category transaction tables, sorted largest to smallest
+
+### Opening balances
+
+During setup (or by editing `opening.journal` directly), you can set starting balances for your accounts. Without these, balance reports only reflect transaction flows and asset totals will appear incorrect. Enter positive amounts for assets and negative amounts for liabilities (e.g. credit card debt).
 
 ### Configuration
 
