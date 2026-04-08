@@ -1,10 +1,25 @@
 # Acclaud
 
-AI-powered personal finance tracking with [hledger](https://hledger.org/) and [Claude](https://claude.ai/claude-code).
+[![PyPI](https://img.shields.io/pypi/v/acclaud)](https://pypi.org/project/acclaud/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+
+AI-powered personal finance tracking with [hledger](https://hledger.org/) and [Claude](https://docs.anthropic.com/en/docs/claude-code).
+
+![Sankey expense diagram](docs/sankey-example.png)
+
+## How it works
+
+1. Export CSVs from your bank or credit card
+2. `acclaud import` sends them to Claude, which categorizes each transaction into your expense accounts
+3. Transactions are stored in plain-text hledger journals
+4. `acclaud report` generates a monthly markdown report with balances, statements, and a Sankey diagram
+
+Merchant categorizations are learned from your history, so imports stay consistent over time.
 
 ## Installation
 
-Requires Python 3.9+, hledger, and Claude Code.
+> **System dependencies:** Acclaud requires [hledger](https://hledger.org/install.html) and [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed and available on your PATH.
 
 ### 1. Install hledger
 
@@ -19,6 +34,12 @@ npm install -g @anthropic-ai/claude-code
 ```
 
 ### 3. Install Acclaud
+
+```sh
+pip install acclaud
+```
+
+Or install from source:
 
 ```sh
 pip install git+https://github.com/TerenceFox/acclaud
@@ -40,6 +61,7 @@ The setup wizard walks you through adding your bank accounts, credit cards, loan
 ```sh
 acclaud import                           # import all CSVs in csv/
 acclaud import csv/ally-checking.csv     # import one file
+acclaud import --dry-run                 # preview without writing
 acclaud balance "2026-03"                # account balances
 acclaud expenses "this month"            # expense breakdown
 acclaud income "2026-03"                 # income statement
@@ -82,3 +104,11 @@ ACCLAUD_ATTACHMENTS=~/notes/attachments
 |---|---|---|
 | `ACCLAUD_OUTPUT` | Output directory for reports and images | `output/` |
 | `ACCLAUD_ATTACHMENTS` | Optional separate directory for images | same as `ACCLAUD_OUTPUT` |
+
+## Built with
+
+- [hledger](https://hledger.org/) -- plain-text accounting
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) -- AI-powered CSV categorization
+- [Plotly](https://plotly.com/python/) -- Sankey diagrams
+
+Built with [Claude Code](https://claude.ai/claude-code).

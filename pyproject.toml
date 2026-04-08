@@ -1,20 +1,47 @@
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "acclaud"
 version = "0.1.0"
 description = "AI-powered personal finance tracking with hledger and Claude"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.9"
+authors = [
+    {name = "Terence Fox"},
+]
+keywords = ["hledger", "finance", "budgeting", "accounting", "cli", "plaintext-accounting", "claude", "ai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial :: Accounting",
+]
 dependencies = [
-    "plotly",
-    "kaleido",
-    "python-dotenv",
+    "plotly>=5.0",
+    "kaleido>=0.2",
+    "python-dotenv>=0.19",
 ]
 
-[tool.setuptools]
-py-modules = ["acclaud"]
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.urls]
+Homepage = "https://github.com/TerenceFox/acclaud"
+Repository = "https://github.com/TerenceFox/acclaud"
+Issues = "https://github.com/TerenceFox/acclaud/issues"
 
 [project.scripts]
 acclaud = "acclaud:main"
+
+[tool.setuptools]
+py-modules = ["acclaud"]

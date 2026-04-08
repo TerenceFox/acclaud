@@ -22,6 +22,7 @@ import glob
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -48,7 +49,17 @@ def load_config():
         print("No config.json found. Run: acclaud setup", file=sys.stderr)
         sys.exit(1)
     with open(CONFIG_PATH) as f:
-        return json.load(f)
+        config = json.load(f)
+    for key in ("currency", "currency_symbol", "accounts"):
+        if key not in config:
+            print(f"Error: config.json missing required key '{key}'", file=sys.stderr)
+            sys.exit(1)
+    accts = config.get("accounts", {})
+    for section in ("assets", "liabilities", "income", "expenses"):
+        if section not in accts:
+            print(f"Error: config.json missing accounts.{section}", file=sys.stderr)
+            sys.exit(1)
+    return config
 
 
 def hledger(*args):
@@ -206,10 +217,17 @@ def clean_result(text):
 
 
 def cmd_import(args):
+    dry_run = "--dry-run" in args
+    args = [a for a in args if a != "--dry-run"]
+
     config = load_config()
 
     if args:
         files = args
+        for f in files:
+            if not os.path.isfile(f):
+                print(f"Error: file not found: {f}", file=sys.stderr)
+                sys.exit(1)
     else:
         files = sorted(
             glob.glob(os.path.join(CSV_DIR, "*.csv"))
@@ -253,12 +271,17 @@ def cmd_import(args):
             print(f"  SKIP: No transactions found")
             continue
 
-        with open(TRANSACTIONS, "a") as f:
-            f.write(f"\n; Imported from {os.path.basename(csvfile)} on {date.today()}\n")
-            f.write(cleaned + "\n")
-
         tx_count = sum(1 for line in cleaned.splitlines() if re.match(r"^\d{4}-", line))
-        print(f"  Done: {tx_count} transactions imported")
+
+        if dry_run:
+            print(f"\n; Imported from {os.path.basename(csvfile)} on {date.today()}")
+            print(cleaned)
+            print(f"\n  (dry run: {tx_count} transactions not written)")
+        else:
+            with open(TRANSACTIONS, "a") as f:
+                f.write(f"\n; Imported from {os.path.basename(csvfile)} on {date.today()}\n")
+                f.write(cleaned + "\n")
+            print(f"  Done: {tx_count} transactions imported")
 
         # Update merchant map for next file in this run
         desc = None
@@ -710,23 +733,59 @@ COMMANDS = {
     "report":   cmd_report,
 }
 
+COMMAND_HELP = {
+    "setup":    "Configure accounts, categories, and currency interactively.",
+    "import":   "Import CSV bank/credit card statements.\n\n  Usage: acclaud import [--dry-run] [file.csv ...]\n\n  Reads all CSVs in csv/ by default, or specific files if given.\n  --dry-run  Preview imported transactions without writing to journal.",
+    "balance":  "Show account balances for a period. Alias: bal",
+    "expenses": "Show expense breakdown for a period. Alias: exp",
+    "income":   "Show income statement for a period. Alias: is",
+    "monthly":  "Show monthly expense totals. Alias: mon",
+    "cashflow": "Show cash flow statement. Alias: cf",
+    "sankey":   "Generate Sankey expense diagram in browser.\n\n  Usage: acclaud sankey [period]",
+    "report":   "Generate full monthly Obsidian markdown report.\n\n  Usage: acclaud report [YYYY-MM]",
+}
+
+
+def check_dependency(name, install_hint):
+    if not shutil.which(name):
+        print(f"Error: {name} not found on PATH.", file=sys.stderr)
+        print(f"Install: {install_hint}", file=sys.stderr)
+        sys.exit(1)
+
 
 def main():
     if len(sys.argv) < 2 or sys.argv[1] in ("-h", "--help", "help"):
+        if len(sys.argv) > 2 and sys.argv[2] in COMMAND_HELP:
+            print(f"acclaud {sys.argv[2]}: {COMMAND_HELP[sys.argv[2]]}")
+            sys.exit(0)
         print(__doc__.strip())
         sys.exit(0)
 
     cmd = sys.argv[1]
     args = sys.argv[2:]
 
+    if cmd in ("-h", "--help"):
+        print(__doc__.strip())
+        sys.exit(0)
+
+    if args and args[0] in ("-h", "--help"):
+        if cmd in COMMAND_HELP:
+            print(f"acclaud {cmd}: {COMMAND_HELP[cmd]}")
+            sys.exit(0)
+
     if cmd not in COMMANDS:
-        print(f"Unknown command: {cmd}")
+        print(f"Unknown command: {cmd}", file=sys.stderr)
         print(f"Available: {', '.join(dict.fromkeys(COMMANDS.keys()))}")
         sys.exit(1)
 
     if cmd != "setup" and not os.path.isfile(CONFIG_PATH):
         print("No config.json found. Run 'acclaud setup' first.")
         sys.exit(1)
+
+    if cmd not in ("setup", "help"):
+        check_dependency("hledger", "https://hledger.org/install.html")
+    if cmd == "import":
+        check_dependency("claude", "npm install -g @anthropic-ai/claude-code")
 
     COMMANDS[cmd](args)
 
