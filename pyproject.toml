@@ -40,7 +40,7 @@ Repository = "https://github.com/TerenceFox/acclaud"
 Issues = "https://github.com/TerenceFox/acclaud/issues"
 
 [project.scripts]
-acclaud = "acclaud:main"
+acclaud = "acclaud.cli:main"
 
 [tool.setuptools]
-py-modules = ["acclaud"]
+packages = ["acclaud"]
