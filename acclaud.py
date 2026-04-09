@@ -782,11 +782,17 @@ def cmd_setup(_args):
     write_accounts_journal(config)
     write_budget_journal(config)
 
-    # Create empty opening.journal if it doesn't exist (so hledger include doesn't fail)
-    opening_file = os.path.join(PROJECT_DIR, "opening.journal")
-    if not os.path.exists(opening_file):
-        with open(opening_file, "w", encoding="utf-8") as f:
-            f.write("; Opening balances (use acclaud setup to populate)\n")
+    os.makedirs(os.path.join(PROJECT_DIR, "csv"), exist_ok=True)
+
+    # Create empty placeholder journals if they don't exist (so hledger includes don't fail)
+    for name, comment in [
+        ("opening.journal", "; Opening balances (use acclaud setup to populate)"),
+        ("transactions.journal", "; Imported transactions (use acclaud import to populate)"),
+    ]:
+        path = os.path.join(PROJECT_DIR, name)
+        if not os.path.exists(path):
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(comment + "\n")
 
     # Opening balances (optional)
     setup_opening_balances(config)

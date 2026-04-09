@@ -54,7 +54,7 @@ mkdir my-budget && cd my-budget
 acclaud setup
 ```
 
-The setup wizard walks you through adding your bank accounts, credit cards, loans, expense categories, opening balances, and output directories. Everything is stored in `config.json` in your project folder, so each directory is a self-contained budget — you can run multiple budgets on the same machine.
+The setup wizard walks you through adding your bank accounts, credit cards, loans, expense categories, opening balances, and output directories. It creates all the files needed to get started (`config.json`, journal files, and a `csv/` directory). Everything lives in your project folder, so each directory is a self-contained budget — you can run multiple budgets on the same machine.
 
 ## Usage
 
