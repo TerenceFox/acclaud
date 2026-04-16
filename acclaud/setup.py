@@ -4,7 +4,7 @@ import os
 import sys
 from datetime import date
 
-from acclaud import config
+from acclaud import config, simplefin
 from acclaud.helpers import ask, yes_no, format_currency
 
 DEFAULT_EXPENSES = [
@@ -90,6 +90,7 @@ def write_accounts_journal(cfg):
 
     lines.append("; Equity")
     lines.append("account equity:opening balances")
+    lines.append("account equity:in-transit  ; holds the other side of transfers between your accounts; should net to zero")
     lines.append("")
 
     lines.append("; Expenses")
@@ -175,6 +176,87 @@ def setup_opening_balances(cfg):
     print(f"Wrote {opening_file}")
 
 
+def _prompt_simplefin_names(cfg):
+    """For each asset/liability, ask for its SimpleFIN display name.
+
+    If an access URL is configured, queries the API to show the live list of
+    account names so the user can pick by number instead of typing.
+    """
+    all_accts = cfg["accounts"]["assets"] + cfg["accounts"]["liabilities"]
+    if not all_accts:
+        return
+
+    detected = []
+    access_url = simplefin.get_access_url()
+    if access_url:
+        print("\nFetching account list from SimpleFIN...")
+        try:
+            detected = simplefin.list_accounts(access_url)
+        except simplefin.SimpleFINError as e:
+            print(f"  (Couldn't fetch account list: {e}. Falling back to manual entry.)")
+
+    if detected:
+        print("\nSimpleFIN reports these accounts:")
+        for i, a in enumerate(detected, 1):
+            label = a["name"] or "(unnamed)"
+            if a["org"]:
+                label = f"{label} — {a['org']}"
+            print(f"  {i}. {label}")
+        print("\nFor each acclaud account, enter the matching SimpleFIN name OR its number above.")
+    else:
+        print("\nFor each account, enter its name as shown in SimpleFIN.")
+    print("(Press Enter to skip — unmapped accounts are ignored on import.)")
+
+    for acct in all_accts:
+        current = acct.get("simplefin_name", "")
+        val = ask(f"  {acct['name']}", current)
+        if not val:
+            continue
+        if val.isdigit() and detected:
+            idx = int(val) - 1
+            if 0 <= idx < len(detected):
+                val = detected[idx]["name"]
+            else:
+                print(f"    (Number out of range — storing '{val}' as-is.)")
+        acct["simplefin_name"] = val
+
+
+def setup_simplefin(cfg):
+    """Optional SimpleFIN setup. Safe to re-run."""
+    print("\n--- SimpleFIN (optional) ---")
+    print("SimpleFIN ($15/yr) lets acclaud fetch transactions directly from your banks.")
+    print("  Sign up: https://beta-bridge.simplefin.org")
+    already = simplefin.is_configured()
+    if already:
+        print(f"  Credentials already present at {simplefin.CREDENTIALS_PATH}.")
+        if yes_no("Replace existing credentials?", default=False):
+            _run_token_exchange()
+        _prompt_simplefin_names(cfg)
+        return
+
+    if not yes_no("Configure SimpleFIN now?", default=False):
+        return
+
+    if _run_token_exchange():
+        _prompt_simplefin_names(cfg)
+
+
+def _run_token_exchange():
+    """Prompt for setup token, exchange, and write credentials. Return True on success."""
+    token = ask("Paste your SimpleFIN setup token")
+    if not token:
+        print("  Skipped SimpleFIN setup.")
+        return False
+    try:
+        access_url = simplefin.exchange_setup_token(token.strip())
+    except simplefin.SimpleFINError as e:
+        print(f"  Token exchange failed: {e}")
+        return False
+    simplefin.write_credentials(access_url)
+    print(f"  Wrote {simplefin.CREDENTIALS_PATH} (0600).")
+    return True
+
+
 def setup_output_dirs(cfg):
     """Optionally configure output directories in config.json."""
     print("\n--- Output Directories (optional) ---")
@@ -204,6 +286,14 @@ def cmd_setup(_args):
 
     if os.path.exists(config.CONFIG_PATH):
         if not yes_no("\nconfig.json already exists. Reconfigure?", default=False):
+            if yes_no("Update SimpleFIN credentials / account mappings only?", default=False):
+                with open(config.CONFIG_PATH, encoding="utf-8") as f:
+                    cfg = json.load(f)
+                setup_simplefin(cfg)
+                with open(config.CONFIG_PATH, "w", encoding="utf-8") as f:
+                    json.dump(cfg, f, indent=2)
+                print(f"\nUpdated {config.CONFIG_PATH}")
+                return
             print("Aborted.")
             return
 
@@ -253,6 +343,9 @@ def cmd_setup(_args):
 
     # Output directories (optional, before writing config)
     setup_output_dirs(cfg)
+
+    # SimpleFIN (optional) — may add simplefin_name fields to asset/liability accounts
+    setup_simplefin(cfg)
 
     with open(config.CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(cfg, f, indent=2)
