@@ -6,6 +6,9 @@ csv/*.CSV
 *.journal
 config.json
 
+# Specs (symlinked from Obsidian vault)
+specs/
+
 # Environment and build
 .env
 output/
