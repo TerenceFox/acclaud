@@ -6,7 +6,7 @@
 
 AI-powered personal finance tracking with [hledger](https://hledger.org/) and [Claude](https://docs.anthropic.com/en/docs/claude-code).
 
-![Sankey expense diagram](docs/sankey-example.png)
+![Sankey expense diagram](assets/sankey-example.png)
 
 ## How it works
 
@@ -45,7 +45,23 @@ Or install from source:
 pip install git+https://github.com/TerenceFox/acclaud
 ```
 
-Python dependencies (plotly, kaleido) are installed automatically.
+Python dependencies (plotly, kaleido, requests) are installed automatically.
+
+### Upgrading
+
+If you installed with **pipx**:
+
+```sh
+pipx upgrade acclaud
+```
+
+If you installed with **pip**:
+
+```sh
+pip install --upgrade acclaud
+```
+
+Both commands re-sync dependencies from `pyproject.toml`, so new deps added in a release (e.g. `requests` in the SimpleFIN release) are installed automatically.
 
 ## Getting started
 
@@ -59,8 +75,9 @@ The setup wizard walks you through adding your bank accounts, credit cards, loan
 ## Usage
 
 ```sh
-acclaud import                           # import all CSVs in csv/
-acclaud import csv/ally-checking.csv     # import one file
+acclaud import                           # fetch from SimpleFIN (if configured) or import CSVs in csv/
+acclaud import csv/ally-checking.csv     # import one file (overrides SimpleFIN)
+acclaud import --from 2026-03-01 --to 2026-03-31
 acclaud import --dry-run                 # preview without writing
 acclaud balance "2026-03"                # account balances
 acclaud expenses "this month"            # expense breakdown
@@ -75,9 +92,31 @@ All commands default to the previous month when no period is given.
 
 ### Importing
 
+Two supported sources — same command either way:
+
+**From CSV** (default):
+
 1. Export a CSV from your bank or credit card
 2. Drop it into `csv/` with a filename matching your account (configured during setup)
 3. Run `acclaud import`
+
+**From SimpleFIN** (automated, optional):
+
+[SimpleFIN](https://beta-bridge.simplefin.org) ($15/yr) gives acclaud read-only API access to your bank and credit card transactions. When configured, `acclaud import` fetches transactions directly — no CSV export step.
+
+1. Sign up at https://beta-bridge.simplefin.org and connect your accounts
+2. Copy the setup token from your SimpleFIN dashboard
+3. Run `acclaud setup` and answer yes at the SimpleFIN prompt (or re-run setup, decline full reconfigure, and accept "Update SimpleFIN only")
+4. For each of your acclaud asset/liability accounts, enter its SimpleFIN display name when prompted
+5. Run `acclaud import`
+
+The access URL is stored at `~/.config/acclaud/credentials` (mode 0600). Alternatively, set `SIMPLEFIN_ACCESS_URL` in the environment — env var takes precedence over the file.
+
+**Date ranges**: by default, imports cover the 1st of the current month to today. Override with `--from YYYY-MM-DD --to YYYY-MM-DD`. Repeated imports are deduplicated via SimpleFIN transaction IDs recorded in `transactions.journal` as `; simplefin-id:…` comments.
+
+**Mixed sources in one run**: if SimpleFIN is configured AND you also have CSVs in `csv/`, `acclaud import` processes both in a single pass. CSV files that resolve to a SimpleFIN-managed account (one with `simplefin_name` set) are skipped with a warning to prevent duplicates. This makes transitioning one account at a time easy: once you set `simplefin_name` on an account, its CSVs are auto-ignored.
+
+**Explicit file arg wins**: if you run `acclaud import some-file.csv`, it takes the CSV path regardless of SimpleFIN configuration (no SimpleFIN fetch, no mixing).
 
 Claude categorizes each transaction into the appropriate expense account. Existing transactions are used to build a merchant-to-category mapping, ensuring consistent categorization across imports.
 

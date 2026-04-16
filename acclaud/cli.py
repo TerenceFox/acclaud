@@ -46,7 +46,7 @@ COMMANDS = {
 
 COMMAND_HELP = {
     "setup":    "Configure accounts, categories, and currency interactively.",
-    "import":   "Import CSV bank/credit card statements.\n\n  Usage: acclaud import [--dry-run] [file.csv ...]\n\n  Reads all CSVs in csv/ by default, or specific files if given.\n  --dry-run  Preview imported transactions without writing to journal.",
+    "import":   "Import transactions from SimpleFIN or CSV.\n\n  Usage: acclaud import [--dry-run] [--from YYYY-MM-DD] [--to YYYY-MM-DD] [file.csv ...]\n\n  Source is chosen automatically:\n    - If a file is given, it is imported as CSV.\n    - Else if SimpleFIN is configured (SIMPLEFIN_ACCESS_URL or credentials file),\n      transactions are fetched from the API.\n    - Else all CSVs in csv/ are processed.\n\n  --from / --to   Date range (default: 1st of current month → today).\n                  For SimpleFIN, passed as API query params. For CSV, a hint to Claude.\n  --dry-run       Preview without writing to journal.",
     "balance":  "Show account balances for a period. Alias: bal",
     "expenses": "Show expense breakdown for a period. Alias: exp",
     "income":   "Show income statement for a period. Alias: is",
