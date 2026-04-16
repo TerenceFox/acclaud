@@ -90,7 +90,8 @@ def write_accounts_journal(cfg):
 
     lines.append("; Equity")
     lines.append("account equity:opening balances")
-    lines.append("account equity:in-transit  ; holds the other side of transfers between your accounts; should net to zero")
+    if cfg.get("use_in_transit"):
+        lines.append("account equity:in-transit  ; holds the other side of transfers between your accounts; should net to zero")
     lines.append("")
 
     lines.append("; Expenses")
@@ -313,9 +314,23 @@ def cmd_setup(_args):
 
     expenses = setup_expenses()
 
+    use_in_transit = False
+    if len(assets) + len(liabilities) > 1:
+        print("\n--- Transfer Tracking ---")
+        if liabilities:
+            print("You have credit cards — payments from a bank account to a card")
+            print("will appear in both accounts' statements.")
+        else:
+            print("You have multiple bank accounts — transfers between them")
+            print("will appear in both accounts' statements.")
+        print("An equity:in-transit account prevents double-counting by letting")
+        print("each side record independently.")
+        use_in_transit = yes_no("Add equity:in-transit?")
+
     cfg = {
         "currency": currency,
         "currency_symbol": symbol,
+        "use_in_transit": use_in_transit,
         "accounts": {
             "assets": assets,
             "liabilities": liabilities,

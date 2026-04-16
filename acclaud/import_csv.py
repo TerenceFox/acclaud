@@ -178,7 +178,9 @@ def build_prompt(transactions, csv_bundles, cfg, merchant_map, date_from=None, d
         "EXPENSE ACCOUNTS:",
         expense_accounts,
         "",
-        "THE USER'S OTHER ACCOUNTS (list these to recognize transfers, but do NOT use them as balancing postings — transfers balance to equity:in-transit):",
+        ("THE USER'S OTHER ACCOUNTS (list these to recognize transfers, but do NOT use them as balancing postings — transfers balance to equity:in-transit):"
+         if cfg.get("use_in_transit") else
+         "OTHER ACCOUNTS (use only if a transaction is a transfer between accounts):"),
         other_accounts,
         "",
         "PREVIOUS MERCHANT CATEGORIZATIONS (use these to stay consistent — always categorize a merchant the same way):",
@@ -215,16 +217,47 @@ def build_prompt(transactions, csv_bundles, cfg, merchant_map, date_from=None, d
             "Skip any CSV row outside that range.",
         ]
 
+    use_in_transit = cfg.get("use_in_transit", False)
+
+    transfer_instructions = []
+    if use_in_transit:
+        transfer_instructions = [
+            "- For TRANSFERS between the user's OWN accounts (e.g. credit card payment, checking↔savings, cash advance), the balancing posting MUST be `equity:in-transit` — NOT the counterparty asset or liability account. The counterparty will have its own entry from its own CSV/SimpleFIN source; equity:in-transit cancels across both sides.",
+            "  - How to recognize: the description names one of the user's other configured accounts (the OTHER ACCOUNTS list above), e.g. 'Chase Credit Card Autopay' when 'chase' is a configured liability, or 'Transfer to Savings' when 'savings' is a configured asset.",
+            "  - Payments from a bank account to a credit card are transfers. Credit card purchases at merchants are NOT transfers (they are expenses).",
+            "  - External transfers (Zelle/Venmo/Paypal to someone else) are NOT transfers — they are expenses.",
+        ]
+    else:
+        transfer_instructions = [
+            "- For transfers between accounts (e.g. credit card payment, checking↔savings), use the appropriate OTHER account — NOT an expense account.",
+        ]
+
+    transfer_examples = []
+    if use_in_transit:
+        transfer_examples = [
+            "",
+            f"2026-03-20 Chase Credit Card Autopay",
+            f"    equity:in-transit          {symbol}250.00",
+            f"    assets:ally checking      -{symbol}250.00",
+            "",
+            f"2026-03-20 Payment Received — Thank You",
+            f"    liabilities:chase visa     {symbol}250.00",
+            f"    equity:in-transit         -{symbol}250.00",
+        ]
+
+    cc_sign = (
+        f"- credit card accounts: expense postings POSITIVE, liability posting NEGATIVE. Payments to the card are POSITIVE on the liability (reducing debt) and balance to equity:in-transit NEGATIVE."
+        if use_in_transit else
+        f"- credit card accounts: expense postings POSITIVE, liability posting NEGATIVE. Payments to the card are POSITIVE on the liability (reducing debt) and NEGATIVE on the paying bank account."
+    )
+
     parts += [
         "",
         "INSTRUCTIONS:",
         "- If a merchant matches or closely matches one from PREVIOUS MERCHANT CATEGORIZATIONS, reuse its expense account.",
         "- Use your best judgment to assign each transaction to the most appropriate expense account based on the merchant/description.",
         "- For income/deposits, use the appropriate income account.",
-        "- For TRANSFERS between the user's OWN accounts (e.g. credit card payment, checking↔savings, cash advance), the balancing posting MUST be `equity:in-transit` — NOT the counterparty asset or liability account. The counterparty will have its own entry from its own CSV/SimpleFIN source; equity:in-transit cancels across both sides.",
-        "  - How to recognize: the description names one of the user's other configured accounts (the OTHER ACCOUNTS list above), e.g. 'Chase Credit Card Autopay' when 'chase' is a configured liability, or 'Transfer to Savings' when 'savings' is a configured asset.",
-        "  - Payments from a bank account to a credit card are transfers. Credit card purchases at merchants are NOT transfers (they are expenses).",
-        "  - External transfers (Zelle/Venmo/Paypal to someone else) are NOT transfers — they are expenses.",
+        *transfer_instructions,
         "- Clean up descriptions to be human-readable.",
         "- Format dates as YYYY-MM-DD.",
         f"- Use the {symbol} symbol on amounts, e.g. {symbol}50.00.",
@@ -234,7 +267,7 @@ def build_prompt(transactions, csv_bundles, cfg, merchant_map, date_from=None, d
         "",
         "SIGN CONVENTIONS for raw CSV rows (they are NOT pre-normalized):",
         "- bank/checking accounts: expense postings POSITIVE, bank-account posting NEGATIVE. Income is the reverse.",
-        "- credit card accounts: expense postings POSITIVE, liability posting NEGATIVE. Payments to the card are POSITIVE on the liability (reducing debt) and balance to equity:in-transit NEGATIVE.",
+        cc_sign,
         "- For NORMALIZED TRANSACTIONS: simply use amount as the source_account posting and -amount as the balancing posting (signs already baked in).",
         "",
         "Examples:",
@@ -242,14 +275,7 @@ def build_prompt(transactions, csv_bundles, cfg, merchant_map, date_from=None, d
         f"    expenses:food              {symbol}85.32",
         f"    assets:ally checking      -{symbol}85.32",
         f"    ; simplefin-id:txn_abc",
-        "",
-        f"2026-03-20 Chase Credit Card Autopay",
-        f"    equity:in-transit          {symbol}250.00",
-        f"    assets:ally checking      -{symbol}250.00",
-        "",
-        f"2026-03-20 Payment Received — Thank You",
-        f"    liabilities:chase visa     {symbol}250.00",
-        f"    equity:in-transit         -{symbol}250.00",
+        *transfer_examples,
     ]
 
     return "\n".join(parts)
