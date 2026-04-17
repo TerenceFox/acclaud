@@ -1,0 +1,25 @@
+{
+  "currency": "USD",
+  "currency_symbol": "$",
+  "use_in_transit": true,
+  "accounts": {
+    "assets": [
+      {"name": "chase checking", "csv_patterns": ["chase*check*"]},
+      {"name": "ally savings", "csv_patterns": ["ally*sav*"]}
+    ],
+    "liabilities": [
+      {"name": "amex gold", "type": "credit card", "csv_patterns": ["amex*"]}
+    ],
+    "income": ["salary", "freelance", "other"],
+    "expenses": [
+      {"name": "housing", "description": "rent, mortgage, utilities, internet, insurance"},
+      {"name": "food", "description": "groceries, restaurants, coffee, delivery"},
+      {"name": "transportation", "description": "gas, parking, transit, rideshare"},
+      {"name": "shopping", "description": "clothing, electronics, household goods"},
+      {"name": "subscriptions", "description": "streaming, software, memberships"},
+      {"name": "travel", "description": "flights, hotels, travel expenses"},
+      {"name": "health", "description": "medical, pharmacy, dental"},
+      {"name": "other", "description": "gifts, fees, everything else"}
+    ]
+  }
+}

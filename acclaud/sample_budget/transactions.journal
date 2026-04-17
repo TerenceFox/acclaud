@@ -1,0 +1,381 @@
+; === January 2026 ===
+
+2026-01-02 Employer Inc - Payroll
+    assets:chase checking                  $3,450.00
+    income:salary
+
+2026-01-03 Whole Foods Market
+    expenses:food                             $87.43
+    liabilities:amex gold
+
+2026-01-03 Netflix
+    expenses:subscriptions                    $22.99
+    liabilities:amex gold
+
+2026-01-04 Shell Gas Station
+    expenses:transportation                   $48.72
+    liabilities:amex gold
+
+2026-01-05 Riverside Property Mgmt
+    expenses:housing                       $1,850.00
+    assets:chase checking
+
+2026-01-05 Con Edison
+    expenses:housing                         $142.30
+    assets:chase checking
+
+2026-01-06 Trader Joe's
+    expenses:food                             $63.18
+    liabilities:amex gold
+
+2026-01-07 Spotify
+    expenses:subscriptions                    $10.99
+    liabilities:amex gold
+
+2026-01-08 CVS Pharmacy
+    expenses:health                           $24.50
+    liabilities:amex gold
+
+2026-01-09 MTA MetroCard
+    expenses:transportation                   $33.00
+    liabilities:amex gold
+
+2026-01-10 Amazon
+    expenses:shopping                         $47.82
+    liabilities:amex gold
+
+2026-01-11 Szechuan Palace
+    expenses:food                             $38.75
+    liabilities:amex gold
+
+2026-01-12 Verizon Wireless
+    expenses:housing                          $65.00
+    assets:chase checking
+
+2026-01-13 Equinox Gym
+    expenses:subscriptions                    $89.00
+    liabilities:amex gold
+
+2026-01-14 Key Food
+    expenses:food                             $52.90
+    liabilities:amex gold
+
+2026-01-15 Employer Inc - Payroll
+    assets:chase checking                  $3,450.00
+    income:salary
+
+2026-01-15 Transfer to Savings
+    assets:ally savings                      $500.00
+    assets:chase checking
+
+2026-01-16 Uber
+    expenses:transportation                   $18.45
+    liabilities:amex gold
+
+2026-01-17 Target
+    expenses:shopping                         $73.24
+    liabilities:amex gold
+
+2026-01-18 Chipotle
+    expenses:food                             $14.32
+    liabilities:amex gold
+
+2026-01-20 iCloud Storage
+    expenses:subscriptions                     $2.99
+    liabilities:amex gold
+
+2026-01-21 Amex Gold Payment
+    liabilities:amex gold                    $700.00
+    equity:in-transit
+
+2026-01-21 Amex Gold Payment
+    equity:in-transit                        $700.00
+    assets:chase checking
+
+2026-01-22 Whole Foods Market
+    expenses:food                             $91.67
+    liabilities:amex gold
+
+2026-01-24 Dr. Patel - Copay
+    expenses:health                           $40.00
+    liabilities:amex gold
+
+2026-01-25 Birthday Gift - Mom
+    expenses:other                            $65.00
+    liabilities:amex gold
+
+2026-01-27 Trader Joe's
+    expenses:food                             $55.40
+    liabilities:amex gold
+
+2026-01-28 Lyft
+    expenses:transportation                   $22.10
+    liabilities:amex gold
+
+2026-01-29 New York Times
+    expenses:subscriptions                    $17.00
+    liabilities:amex gold
+
+2026-01-30 Parking Garage
+    expenses:transportation                   $35.00
+    assets:chase checking
+
+2026-01-31 Freelance - Webflow Co
+    assets:chase checking                    $750.00
+    income:freelance
+
+; === February 2026 ===
+
+2026-02-02 Employer Inc - Payroll
+    assets:chase checking                  $3,450.00
+    income:salary
+
+2026-02-02 Riverside Property Mgmt
+    expenses:housing                       $1,850.00
+    assets:chase checking
+
+2026-02-03 Con Edison
+    expenses:housing                         $158.47
+    assets:chase checking
+
+2026-02-03 Whole Foods Market
+    expenses:food                             $79.33
+    liabilities:amex gold
+
+2026-02-04 Netflix
+    expenses:subscriptions                    $22.99
+    liabilities:amex gold
+
+2026-02-05 Shell Gas Station
+    expenses:transportation                   $52.18
+    liabilities:amex gold
+
+2026-02-06 Amazon
+    expenses:shopping                         $124.99
+    liabilities:amex gold
+
+2026-02-07 Spotify
+    expenses:subscriptions                    $10.99
+    liabilities:amex gold
+
+2026-02-08 Key Food
+    expenses:food                             $48.63
+    liabilities:amex gold
+
+2026-02-09 Equinox Gym
+    expenses:subscriptions                    $89.00
+    liabilities:amex gold
+
+2026-02-10 Delta Airlines
+    expenses:travel                          $347.00
+    liabilities:amex gold
+
+2026-02-11 Verizon Wireless
+    expenses:housing                          $65.00
+    assets:chase checking
+
+2026-02-12 Trader Joe's
+    expenses:food                             $71.25
+    liabilities:amex gold
+
+2026-02-13 MTA MetroCard
+    expenses:transportation                   $33.00
+    liabilities:amex gold
+
+2026-02-14 The Capital Grille
+    expenses:food                             $142.50
+    liabilities:amex gold
+
+2026-02-15 Employer Inc - Payroll
+    assets:chase checking                  $3,450.00
+    income:salary
+
+2026-02-15 Transfer to Savings
+    assets:ally savings                      $500.00
+    assets:chase checking
+
+2026-02-16 Marriott Hotel - Austin
+    expenses:travel                          $489.00
+    liabilities:amex gold
+
+2026-02-17 Uber
+    expenses:transportation                   $31.20
+    liabilities:amex gold
+
+2026-02-18 Amex Gold Payment
+    liabilities:amex gold                  $1,200.00
+    equity:in-transit
+
+2026-02-18 Amex Gold Payment
+    equity:in-transit                      $1,200.00
+    assets:chase checking
+
+2026-02-19 Walgreens
+    expenses:health                           $18.75
+    liabilities:amex gold
+
+2026-02-20 iCloud Storage
+    expenses:subscriptions                     $2.99
+    liabilities:amex gold
+
+2026-02-21 Szechuan Palace
+    expenses:food                             $42.10
+    liabilities:amex gold
+
+2026-02-22 Uniqlo
+    expenses:shopping                         $89.50
+    liabilities:amex gold
+
+2026-02-23 Chipotle
+    expenses:food                             $15.87
+    liabilities:amex gold
+
+2026-02-24 ATM Withdrawal
+    expenses:other                            $60.00
+    assets:chase checking
+
+2026-02-25 Trader Joe's
+    expenses:food                             $58.92
+    liabilities:amex gold
+
+2026-02-27 New York Times
+    expenses:subscriptions                    $17.00
+    liabilities:amex gold
+
+2026-02-28 Parking Garage
+    expenses:transportation                   $35.00
+    assets:chase checking
+
+; === March 2026 ===
+
+2026-03-02 Employer Inc - Payroll
+    assets:chase checking                  $3,450.00
+    income:salary
+
+2026-03-02 Riverside Property Mgmt
+    expenses:housing                       $1,850.00
+    assets:chase checking
+
+2026-03-03 Con Edison
+    expenses:housing                         $136.85
+    assets:chase checking
+
+2026-03-03 Whole Foods Market
+    expenses:food                             $94.21
+    liabilities:amex gold
+
+2026-03-04 Netflix
+    expenses:subscriptions                    $22.99
+    liabilities:amex gold
+
+2026-03-05 Key Food
+    expenses:food                             $44.17
+    liabilities:amex gold
+
+2026-03-06 Shell Gas Station
+    expenses:transportation                   $45.33
+    liabilities:amex gold
+
+2026-03-07 Spotify
+    expenses:subscriptions                    $10.99
+    liabilities:amex gold
+
+2026-03-08 Amazon
+    expenses:shopping                         $33.47
+    liabilities:amex gold
+
+2026-03-09 Equinox Gym
+    expenses:subscriptions                    $89.00
+    liabilities:amex gold
+
+2026-03-10 Trader Joe's
+    expenses:food                             $67.83
+    liabilities:amex gold
+
+2026-03-11 Verizon Wireless
+    expenses:housing                          $65.00
+    assets:chase checking
+
+2026-03-12 MTA MetroCard
+    expenses:transportation                   $33.00
+    liabilities:amex gold
+
+2026-03-13 CVS Pharmacy
+    expenses:health                           $31.25
+    liabilities:amex gold
+
+2026-03-14 Pho Saigon
+    expenses:food                             $28.50
+    liabilities:amex gold
+
+2026-03-15 Employer Inc - Payroll
+    assets:chase checking                  $3,450.00
+    income:salary
+
+2026-03-15 Transfer to Savings
+    assets:ally savings                      $500.00
+    assets:chase checking
+
+2026-03-16 Amex Gold Payment
+    liabilities:amex gold                    $900.00
+    equity:in-transit
+
+2026-03-16 Amex Gold Payment
+    equity:in-transit                        $900.00
+    assets:chase checking
+
+2026-03-17 Uber
+    expenses:transportation                   $15.80
+    liabilities:amex gold
+
+2026-03-18 Target
+    expenses:shopping                         $56.12
+    liabilities:amex gold
+
+2026-03-19 Bank Fee
+    expenses:other                            $12.00
+    assets:chase checking
+
+2026-03-20 iCloud Storage
+    expenses:subscriptions                     $2.99
+    liabilities:amex gold
+
+2026-03-21 Chipotle
+    expenses:food                             $16.43
+    liabilities:amex gold
+
+2026-03-22 Whole Foods Market
+    expenses:food                             $82.55
+    liabilities:amex gold
+
+2026-03-23 Lyft
+    expenses:transportation                   $27.40
+    liabilities:amex gold
+
+2026-03-24 New York Times
+    expenses:subscriptions                    $17.00
+    liabilities:amex gold
+
+2026-03-25 Trader Joe's
+    expenses:food                             $61.09
+    liabilities:amex gold
+
+2026-03-27 Freelance - Webflow Co
+    assets:chase checking                    $600.00
+    income:freelance
+
+2026-03-28 Parking Garage
+    expenses:transportation                   $35.00
+    assets:chase checking
+
+2026-03-29 Dental Associates
+    expenses:health                          $175.00
+    liabilities:amex gold
+
+2026-03-30 H&M
+    expenses:shopping                         $42.80
+    liabilities:amex gold
+
+2026-03-31 Venmo - Concert Tickets
+    expenses:other                            $85.00
+    assets:chase checking

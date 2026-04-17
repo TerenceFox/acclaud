@@ -1,0 +1,4 @@
+commodity $1,000.00
+
+include accounts.journal
+include transactions.journal

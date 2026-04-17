@@ -63,7 +63,20 @@ pip install --upgrade acclaud
 
 Both commands re-sync dependencies from `pyproject.toml`, so new deps added in a release (e.g. `requests` in the SimpleFIN release) are installed automatically.
 
-## Getting started
+## Quick start
+
+Acclaud ships with a sample budget so you can see it in action immediately:
+
+```sh
+pip install git+https://github.com/TerenceFox/acclaud
+acclaud report
+```
+
+No setup required — the sample budget contains ~100 fictional transactions across three months, enough to produce a full report with balances, income statements, and a Sankey diagram.
+
+### Setting up your own budget
+
+When you're ready to use real data:
 
 ```sh
 mkdir my-budget && cd my-budget

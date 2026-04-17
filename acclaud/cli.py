@@ -20,7 +20,7 @@ import os
 import shutil
 import sys
 
-from acclaud.config import CONFIG_PATH
+from acclaud import config
 from acclaud.setup import cmd_setup
 from acclaud.import_csv import cmd_import
 from acclaud.reports import cmd_hledger_report
@@ -85,9 +85,13 @@ def main():
         print(f"Available: {', '.join(dict.fromkeys(COMMANDS))}")
         sys.exit(1)
 
-    if cmd != "setup" and not os.path.isfile(CONFIG_PATH):
-        print("No config.json found. Run 'acclaud setup' first.")
-        sys.exit(1)
+    if cmd != "setup" and config.using_sample():
+        print("No user config found — using sample budget.\n")
+
+    if cmd == "import" and config.using_sample():
+        print("Sample budget already has transactions.")
+        print("Run `acclaud setup` to configure your own budget.")
+        sys.exit(0)
 
     if cmd not in ("setup", "help"):
         check_dependency("hledger", "https://hledger.org/install.html")

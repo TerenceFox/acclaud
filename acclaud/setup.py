@@ -281,6 +281,7 @@ def setup_output_dirs(cfg):
 
 
 def cmd_setup(_args):
+    config.set_cwd_paths()
     print("=" * 50)
     print("  Acclaud Setup Wizard")
     print("=" * 50)

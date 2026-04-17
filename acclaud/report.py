@@ -19,7 +19,7 @@ def cmd_report(args):
         first = date.today().replace(day=1)
         year_month = (first - timedelta(days=1)).strftime("%Y-%m")
 
-    output_dir = os.path.expanduser(args[1] if len(args) > 1 else cfg.get("output_dir", os.path.join(config.PROJECT_DIR, "output")))
+    output_dir = os.path.expanduser(args[1] if len(args) > 1 else cfg.get("output_dir", os.path.join(os.getcwd(), "output")))
     attachments_dir = os.path.expanduser(args[2] if len(args) > 2 else cfg.get("attachments_dir", output_dir))
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(attachments_dir, exist_ok=True)

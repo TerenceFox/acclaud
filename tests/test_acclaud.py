@@ -387,3 +387,78 @@ class TestAccountIsSimpleFINManaged:
     def test_empty_simplefin_name_is_not_managed(self):
         cfg = {"accounts": {"assets": [{"name": "a", "simplefin_name": ""}], "liabilities": []}}
         assert _account_is_simplefin_managed("assets:a", cfg) is False
+
+
+# ---------- Sample budget / tutorial mode ----------
+
+import os
+import subprocess
+import tempfile
+
+
+class TestSampleBudget:
+    def test_init_paths_falls_back_to_sample(self):
+        orig = os.getcwd()
+        try:
+            with tempfile.TemporaryDirectory() as d:
+                os.chdir(d)
+                config.init_paths()
+                assert config.using_sample()
+                assert "sample_budget" in config.PROJECT_DIR
+        finally:
+            os.chdir(orig)
+            config.init_paths()
+
+    def test_init_paths_uses_cwd_when_config_exists(self):
+        orig = os.getcwd()
+        try:
+            with tempfile.TemporaryDirectory() as d:
+                with open(os.path.join(d, "config.json"), "w") as f:
+                    f.write("{}")
+                os.chdir(d)
+                config.init_paths()
+                assert not config.using_sample()
+                assert config.PROJECT_DIR == d
+        finally:
+            os.chdir(orig)
+            config.init_paths()
+
+    def test_set_cwd_paths_overrides_sample(self):
+        orig = os.getcwd()
+        try:
+            with tempfile.TemporaryDirectory() as d:
+                os.chdir(d)
+                config.init_paths()
+                assert config.using_sample()
+                config.set_cwd_paths()
+                assert not config.using_sample()
+                assert config.PROJECT_DIR == d
+        finally:
+            os.chdir(orig)
+            config.init_paths()
+
+    def test_sample_config_is_valid(self):
+        orig_dir = config.PROJECT_DIR
+        orig_sample = config._sample_mode
+        try:
+            config.PROJECT_DIR = config._sample_budget_dir()
+            config.CONFIG_PATH = os.path.join(config.PROJECT_DIR, "config.json")
+            config._sample_mode = True
+            cfg = config.load_config()
+            assert cfg["currency"] == "USD"
+            assert cfg["currency_symbol"] == "$"
+            assert len(cfg["accounts"]["assets"]) == 2
+            assert len(cfg["accounts"]["expenses"]) == 8
+        finally:
+            config.PROJECT_DIR = orig_dir
+            config._sample_mode = orig_sample
+            config.init_paths()
+
+    def test_sample_journal_valid_hledger(self):
+        journal = os.path.join(config._sample_budget_dir(), "budget.journal")
+        result = subprocess.run(
+            ["hledger", "-f", journal, "bal"],
+            capture_output=True, text=True,
+        )
+        assert result.returncode == 0
+        assert "assets:chase checking" in result.stdout

@@ -1,0 +1,20 @@
+account assets:chase checking
+account assets:ally savings
+
+account liabilities:amex gold
+
+account income:salary
+account income:freelance
+account income:other
+
+account equity:opening balances
+account equity:in-transit
+
+account expenses:housing
+account expenses:food
+account expenses:transportation
+account expenses:shopping
+account expenses:subscriptions
+account expenses:travel
+account expenses:health
+account expenses:other

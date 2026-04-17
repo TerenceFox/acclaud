@@ -6,6 +6,10 @@ csv/*.CSV
 *.journal
 config.json
 
+# But track the bundled sample budget
+!acclaud/sample_budget/*.journal
+!acclaud/sample_budget/config.json
+
 # Specs (symlinked from Obsidian vault)
 specs/
 

@@ -45,3 +45,6 @@ acclaud = "acclaud.cli:main"
 
 [tool.setuptools]
 packages = ["acclaud"]
+
+[tool.setuptools.package-data]
+acclaud = ["sample_budget/*.json", "sample_budget/*.journal"]
