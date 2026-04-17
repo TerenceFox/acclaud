@@ -6,7 +6,7 @@
 
 AI-powered personal finance tracking with [hledger](https://hledger.org/) and [Claude](https://docs.anthropic.com/en/docs/claude-code).
 
-![Sankey expense diagram](assets/sankey-example.png)
+![Demo](assets/demo.gif)
 
 ## How it works
 
