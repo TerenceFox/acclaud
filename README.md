@@ -49,19 +49,11 @@ Python dependencies (plotly, kaleido, requests) are installed automatically.
 
 ### Upgrading
 
-If you installed with **pipx**:
-
 ```sh
-pipx upgrade acclaud
+pip install --upgrade git+https://github.com/TerenceFox/acclaud
 ```
 
-If you installed with **pip**:
-
-```sh
-pip install --upgrade acclaud
-```
-
-Both commands re-sync dependencies from `pyproject.toml`, so new deps added in a release (e.g. `requests` in the SimpleFIN release) are installed automatically.
+This pulls the latest from GitHub and re-syncs dependencies from `pyproject.toml`.
 
 ## Quick start
 
