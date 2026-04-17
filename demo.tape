@@ -34,7 +34,7 @@ Sleep 500ms
 Enter
 Sleep 4s
 
-Type "cat output/2026-02.md | head -60"
+Type `cat "output/2026-02 Budget Report.md" | head -60`
 Sleep 500ms
 Enter
 Sleep 5s
