@@ -87,7 +87,7 @@ def _parse_date_arg(s):
     try:
         return datetime.strptime(s, "%Y-%m-%d").date()
     except ValueError:
-        print(f"Invalid date (expected YYYY-MM-DD): {s}", file=sys.stderr)
+        print(f"Error: invalid date '{s}'. Expected format: YYYY-MM-DD.", file=sys.stderr)
         sys.exit(2)
 
 
@@ -102,7 +102,7 @@ def parse_import_args(args):
             opts.dry_run = True
         elif a == "--from":
             if i + 1 >= len(args):
-                print("--from requires a date argument", file=sys.stderr)
+                print("Error: --from requires a date argument (YYYY-MM-DD).", file=sys.stderr)
                 sys.exit(2)
             opts.date_from = _parse_date_arg(args[i + 1])
             i += 1
@@ -110,14 +110,14 @@ def parse_import_args(args):
             opts.date_from = _parse_date_arg(a.split("=", 1)[1])
         elif a == "--to":
             if i + 1 >= len(args):
-                print("--to requires a date argument", file=sys.stderr)
+                print("Error: --to requires a date argument (YYYY-MM-DD).", file=sys.stderr)
                 sys.exit(2)
             opts.date_to = _parse_date_arg(args[i + 1])
             i += 1
         elif a.startswith("--to="):
             opts.date_to = _parse_date_arg(a.split("=", 1)[1])
         elif a.startswith("--"):
-            print(f"Unknown flag: {a}", file=sys.stderr)
+            print(f"Error: unknown flag '{a}'. Valid flags: --dry-run, --from, --to.", file=sys.stderr)
             sys.exit(2)
         else:
             positional.append(a)
@@ -131,7 +131,7 @@ def resolve_date_range(opts):
     d_from = opts.date_from or today.replace(day=1)
     d_to = opts.date_to or today
     if d_from > d_to:
-        print(f"Error: --from ({d_from}) is after --to ({d_to})", file=sys.stderr)
+        print(f"Error: --from ({d_from}) is after --to ({d_to}). Swap the dates.", file=sys.stderr)
         sys.exit(2)
     return d_from, d_to
 
@@ -334,20 +334,21 @@ def _collect_csv_bundles(cfg, *, skip_simplefin_managed):
         account = resolve_account(csvfile, cfg)
         if not account:
             print(
-                f"  SKIP: {os.path.basename(csvfile)} — cannot determine account from filename",
+                f"  Warning: skipping {os.path.basename(csvfile)} — filename doesn't match any account's csv_patterns in config.json.",
                 file=sys.stderr,
             )
             continue
         if skip_simplefin_managed and _account_is_simplefin_managed(account, cfg):
             print(
-                f"  SKIP: {os.path.basename(csvfile)} — account {account} is SimpleFIN-managed. "
-                f"(Move the CSV out of csv/ or remove simplefin_name from config.json to process it anyway.)"
+                f"  Warning: skipping {os.path.basename(csvfile)} — account {account} is SimpleFIN-managed. "
+                f"Move the CSV out of csv/ or remove simplefin_name from config.json to process it.",
+                file=sys.stderr,
             )
             continue
         with open(csvfile, encoding="utf-8") as f:
             raw = f.read()
         if not raw.strip():
-            print(f"  SKIP: {os.path.basename(csvfile)} — empty file")
+            print(f"  Warning: skipping {os.path.basename(csvfile)} — empty file.", file=sys.stderr)
             continue
         bundles.append(CsvBundle(
             account=account,
@@ -366,7 +367,7 @@ def _import_simplefin_and_csv(opts, cfg, merchant_map):
     try:
         payload = simplefin.fetch_transactions(access_url, d_from, d_to)
     except simplefin.SimpleFINError as e:
-        print(f"Error: {e}", file=sys.stderr)
+        print(f"Error: SimpleFIN fetch failed. {e}", file=sys.stderr)
         sys.exit(1)
 
     transactions = simplefin.normalize(payload, cfg)
@@ -423,7 +424,7 @@ def cmd_import(args):
         files = positional
         for f in files:
             if not os.path.isfile(f):
-                print(f"Error: file not found: {f}", file=sys.stderr)
+                print(f"Error: file not found: {f}. Check the path and try again.", file=sys.stderr)
                 sys.exit(1)
     elif simplefin.is_configured():
         _import_simplefin_and_csv(opts, cfg, merchant_map)
@@ -435,10 +436,10 @@ def cmd_import(args):
         )
         if not files:
             print(
-                "No source for transactions.\n"
+                "Error: no transaction source found.\n"
                 "  - Configure SimpleFIN: run 'acclaud setup' and enable SimpleFIN, or\n"
                 "  - Drop a CSV into csv/, or\n"
-                "  - Run 'acclaud import path/to/file.csv'",
+                "  - Specify a file: acclaud import path/to/file.csv",
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -449,7 +450,7 @@ def cmd_import(args):
         account = resolve_account(csvfile, cfg)
         if not account:
             print(
-                f"  ERROR: Cannot determine account from filename '{os.path.basename(csvfile)}'",
+                f"  Error: filename '{os.path.basename(csvfile)}' doesn't match any account's csv_patterns in config.json.",
                 file=sys.stderr,
             )
             continue
@@ -461,7 +462,7 @@ def cmd_import(args):
             csv_content = f.read()
 
         if not csv_content.strip():
-            print("  SKIP: Empty file")
+            print("  Warning: skipping — empty file.", file=sys.stderr)
             continue
 
         bundle = CsvBundle(

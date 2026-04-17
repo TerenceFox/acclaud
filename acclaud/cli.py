@@ -81,8 +81,8 @@ def main():
             sys.exit(0)
 
     if cmd not in COMMANDS:
-        print(f"Unknown command: {cmd}", file=sys.stderr)
-        print(f"Available: {', '.join(dict.fromkeys(COMMANDS))}")
+        print(f"Error: unknown command '{cmd}'.", file=sys.stderr)
+        print(f"Available: {', '.join(dict.fromkeys(COMMANDS))}", file=sys.stderr)
         sys.exit(1)
 
     if cmd != "setup" and config.using_sample():

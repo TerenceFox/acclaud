@@ -59,12 +59,12 @@ def load_config():
         config = json.load(f)
     for key in ("currency", "currency_symbol", "accounts"):
         if key not in config:
-            print(f"Error: config.json missing required key '{key}'", file=sys.stderr)
+            print(f"Error: config.json missing required key '{key}'. Run 'acclaud setup' to reconfigure.", file=sys.stderr)
             sys.exit(1)
     accts = config.get("accounts", {})
     for section in ("assets", "liabilities", "income", "expenses"):
         if section not in accts:
-            print(f"Error: config.json missing accounts.{section}", file=sys.stderr)
+            print(f"Error: config.json missing accounts.{section}. Run 'acclaud setup' to reconfigure.", file=sys.stderr)
             sys.exit(1)
     return config
 

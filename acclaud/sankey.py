@@ -79,7 +79,8 @@ def cmd_sankey(args):
 
     fig = build_sankey_figure(rows, period)
     if not fig:
-        print("No expense data found for this period.", file=sys.stderr)
+        print(f"Error: no expense data found for period '{period}'.", file=sys.stderr)
+        print("Try a different period (e.g. 'acclaud sankey 2026-01') or import transactions first.", file=sys.stderr)
         sys.exit(1)
 
     fig.update_layout(

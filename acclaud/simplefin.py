@@ -112,7 +112,8 @@ def _warn_duplicate_mappings(cfg):
         if sf in seen:
             print(
                 f"Warning: simplefin_name {a.get('simplefin_name')!r} is set on both "
-                f"{seen[sf]} and {section}:{a['name']}. First match wins.",
+                f"{seen[sf]} and {section}:{a['name']}. First match wins. "
+                f"Remove the duplicate in config.json.",
                 file=sys.stderr,
             )
         else:
@@ -182,7 +183,8 @@ def normalize(payload, cfg):
         if hledger_account is None:
             print(
                 f"Warning: no simplefin_name mapping for SimpleFIN account "
-                f"{sf_name!r} — skipping its transactions.",
+                f"{sf_name!r} — skipping its transactions. "
+                f"Run 'acclaud setup' to map it to an account.",
                 file=sys.stderr,
             )
             continue
@@ -195,7 +197,7 @@ def normalize(payload, cfg):
             try:
                 amount = Decimal(str(amount_str))
             except (InvalidOperation, ValueError):
-                print(f"Warning: could not parse amount {amount_str!r}; skipping.", file=sys.stderr)
+                print(f"Warning: could not parse amount {amount_str!r} — skipping transaction.", file=sys.stderr)
                 continue
             # Sign-flip for liabilities so downstream rendering rule is uniform:
             # source_account posting = amount, balancing posting = -amount.

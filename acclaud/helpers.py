@@ -10,7 +10,7 @@ def hledger(*args):
     cmd = ["hledger", "-f", config.JOURNAL] + list(args)
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        print(f"hledger error: {result.stderr}", file=sys.stderr)
+        print(f"Error: hledger failed.\n{result.stderr.strip()}", file=sys.stderr)
         sys.exit(1)
     return result.stdout
 
